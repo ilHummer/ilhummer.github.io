@@ -29,6 +29,12 @@
             align-items: center;
             z-index: 100;
             background: #000;
+            transition: all 0.3s ease;
+        }
+
+        .header-hidden {
+            opacity: 0;
+            pointer-events: none;
         }
 
         .title {
@@ -69,8 +75,8 @@
 
         .card {
             position: absolute;
-            width: 375px;
-            height: 220px;
+            width: 90%;
+            max-width: 400px;
             left: 50%;
             transform: translateX(-50%);
             border-radius: 12px;
@@ -79,24 +85,20 @@
             transition: all 0.3s ease;
         }
 
-        .loyalty-card {
-            height: 160px;
-        }
-
         .card img {
             width: 100%;
-            height: 100%;
-            object-fit: cover;
+            height: auto;
+            display: block;
         }
 
         .card.active {
             position: fixed;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%) scale(1.1);
             z-index: 1000;
-            width: 90%;
-            height: 70vh;
+            max-width: 95%;
+            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
         }
 
         #done-btn {
@@ -105,10 +107,11 @@
             left: 20px;
             z-index: 1001;
             background: transparent;
-            border: 1px solid white;
             color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
+            border: none;
+            padding: 0;
+            font-size: 20px;
+            font-weight: 600;
             display: none;
             cursor: pointer;
         }
@@ -175,13 +178,11 @@
         const CARD_OFFSET = 60;
 
         function updateCardPositions() {
-            // Credit cards stacking (no scaling)
             creditCards.forEach((card, index) => {
                 card.style.top = `${index * CARD_OFFSET}px`;
                 card.style.zIndex = index + 1;
             });
 
-            // Loyalty cards stacking
             loyaltyCards.forEach((card, index) => {
                 const basePosition = creditCards.length * CARD_OFFSET + 200;
                 card.style.top = `${basePosition + index * CARD_OFFSET}px`;
@@ -201,14 +202,11 @@
             card.appendChild(img);
             section.appendChild(card);
 
-            // Click handler
             card.addEventListener('click', () => {
-                // Hide all other cards
-                document.querySelectorAll('.card').forEach(c => {
-                    c.style.display = 'none';
-                });
+                document.querySelectorAll('.card').forEach(c => c.style.display = 'none');
                 card.style.display = 'block';
                 card.classList.add('active');
+                document.querySelector('header').classList.add('header-hidden');
                 document.getElementById('done-btn').classList.add('visible');
             });
 
@@ -227,6 +225,7 @@
                 card.style.display = 'block';
                 card.classList.remove('active');
             });
+            document.querySelector('header').classList.remove('header-hidden');
             document.getElementById('done-btn').classList.remove('visible');
             updateCardPositions();
         });
