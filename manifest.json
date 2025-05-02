@@ -1,16 +1,15 @@
 {
-    "name": "Fake Wallet",
+    "name": "Fake Wallet App",
     "short_name": "Wallet",
     "start_url": "./index.html",
     "display": "standalone",
-    "background_color": "#000000",
-    "theme_color": "#000000",
+    "background_color": "#ffffff",
+    "theme_color": "#ffffff",
     "icons": [
-      {
-        "src": "icon.png",
-        "sizes": "192x192",
-        "type": "image/png"
-      }
+        {
+            "src": "icon.png",
+            "type": "image/png",
+            "sizes": "192x192"
+        }
     ]
-  }
-  
+}
