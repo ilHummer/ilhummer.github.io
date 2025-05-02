@@ -1,35 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <link rel="stylesheet" href="style.css" />
-    <title>Wallet</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Wallet</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon.png" type="image/png" />
 </head>
 <body>
-    <div class="wallet-header">
-        <h1 class="wallet-title">Wallet</h1>
-        <div class="wallet-actions">
-            <input type="file" id="image-upload" accept="image/*" style="display: none;" />
-            <button id="add-card" title="Add Card">+</button>
-            <button title="More Options">⋯</button>
-        </div>
+
+  <!-- Wallet Header -->
+  <div class="wallet-header">
+    <h1 class="wallet-title">Wallet</h1>
+    <div class="wallet-actions">
+      <button id="addBtn">+</button>
+      <button id="optionsBtn">…</button>
     </div>
+  </div>
 
-    <button id="done-btn">Done</button>
+  <!-- Done Button -->
+  <button id="done-btn">Done</button>
 
-    <div class="card-container" id="credit-container"></div>
-    <div class="card-container" id="loyalty-container"></div>
+  <!-- Card Stack Container -->
+  <div class="card-container" id="cardContainer"></div>
 
-    <!-- Modal -->
-    <div id="card-popup" class="popup hidden">
-        <div class="popup-box">
-            <button class="popup-btn" data-type="credit">Add Credit/Debit Card</button>
-            <button class="popup-btn" data-type="loyalty">Add Loyalty Card</button>
-            <button class="popup-close">Cancel</button>
-        </div>
+  <!-- Card Type Selection Popup -->
+  <div id="popup" class="popup hidden">
+    <div class="popup-box">
+      <button class="popup-btn" id="addCreditBtn">Add Credit Card</button>
+      <button class="popup-btn" id="addLoyaltyBtn">Add Loyalty Card</button>
+      <button class="popup-close" onclick="closePopup()">Cancel</button>
     </div>
+  </div>
 
-    <script src="script.js"></script>
+  <!-- NFC Scan Overlay (fake animation) -->
+  <div id="nfcOverlay" class="nfc-overlay hidden">
+    <div class="nfc-animation">🔄 Scanning...</div>
+  </div>
+
+  <!-- JavaScript -->
+  <script src="script.js"></script>
+
 </body>
 </html>
