@@ -2,45 +2,37 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Wallet</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="stylesheet" href="style.css" />
   <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="icon.png" type="image/png" />
+  <link rel="apple-touch-icon" href="icon.png" />
+  <title>Wallet</title>
 </head>
 <body>
 
-  <!-- Wallet Header -->
-  <div class="wallet-header">
-    <h1 class="wallet-title">Wallet</h1>
-    <div class="wallet-actions">
-      <button id="addBtn">+</button>
-      <button id="optionsBtn">…</button>
+  <!-- Header -->
+  <header>
+    <h1 class="title">Wallet</h1>
+    <div class="controls">
+      <div id="addBtn" class="control-btn">+</div>
+      <div class="control-btn">⋯</div>
     </div>
-  </div>
+  </header>
 
   <!-- Done Button -->
   <button id="done-btn">Done</button>
 
-  <!-- Card Stack Container -->
-  <div class="card-container" id="cardContainer"></div>
+  <!-- Cards Container -->
+  <div id="cardContainer"></div>
 
-  <!-- Card Type Selection Popup -->
-  <div id="popup" class="popup hidden">
-    <div class="popup-box">
-      <button class="popup-btn" id="addCreditBtn">Add Credit Card</button>
-      <button class="popup-btn" id="addLoyaltyBtn">Add Loyalty Card</button>
-      <button class="popup-close" onclick="closePopup()">Cancel</button>
-    </div>
+  <!-- Popup Selector -->
+  <div id="popup" class="hidden">
+    <button id="addCreditBtn">Add Credit Card</button>
+    <button id="addLoyaltyBtn">Add Loyalty Card</button>
   </div>
 
-  <!-- NFC Scan Overlay (fake animation) -->
-  <div id="nfcOverlay" class="nfc-overlay hidden">
-    <div class="nfc-animation">🔄 Scanning...</div>
-  </div>
-
-  <!-- JavaScript -->
   <script src="script.js"></script>
-
 </body>
 </html>
