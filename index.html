@@ -1,260 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Apple Wallet Clone</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #000;
-      color: #fff;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    header {
-      position: fixed;
-      top: 0;
-      width: 100%;
-      padding: 1rem;
-      display: flex;
-      justify-content: space-between;
-      background: #000;
-      z-index: 100;
-    }
-
-    .title { font-size: 28px; font-weight: 700; }
-
-    .control-btn {
-      width: 44px;
-      height: 44px;
-      background: rgba(255,255,255,0.9);
-      border-radius: 22px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-    }
-
-    .control-btn svg {
-      width: 24px;
-      height: 24px;
-      fill: #000;
-    }
-
-    #done-btn {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      z-index: 1001;
-      background: transparent;
-      color: white;
-      border: none;
-      font-size: 20px;
-      font-weight: 600;
-      display: none;
-      cursor: pointer;
-    }
-
-    #done-btn.visible { display: block; }
-
-    .popup {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: #1c1c1e;
-      padding: 1rem;
-      border-radius: 20px 20px 0 0;
-      transform: translateY(100%);
-      transition: transform 0.3s ease;
-      z-index: 1000;
-    }
-
-    .popup.visible { transform: translateY(0); }
-
-    .popup button {
-      width: 100%;
-      padding: 1rem;
-      background: #2a2a2d;
-      border: none;
-      color: #fff;
-      border-radius: 12px;
-      margin-bottom: 10px;
-      cursor: pointer;
-    }
-
-    .wallet-container {
-      margin-top: 80px;
-      padding: 0 10px 50px 10px;
-      height: calc(100vh - 80px);
-      overflow-y: auto;
-    }
-
-    .section {
-      position: relative;
-    }
-
-    .section.loyalty {
-      margin-top: 150px; /* Spaced below main cards */
-    }
-
+    /* Updated CSS */
     .card {
-      position: relative;
-      width: 90%;
-      margin: 0 auto;
-      margin-bottom: -15%; /* Overlap */
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-      transition: all 0.4s ease;
-      z-index: 1;
-      cursor: pointer;
+      transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+      will-change: transform, opacity;
+      margin-top: -120px; /* Increased overlap for closer spacing */
+      transform-origin: center top;
     }
 
-    .card img {
-      width: 100%;
-      height: auto;
-      display: block;
+    .card:first-child {
+      margin-top: 0;
+      transform: none;
     }
 
     .card.active {
-      position: fixed !important;
-      top: 151px;
-      left: 50%;
-      transform: translateX(-50%) scale(1.05);
-      width: 90%;
-      z-index: 1001;
-      margin-bottom: 0;
-      transition: top 0.4s ease, transform 0.4s ease;
+      transform: translate(-50%, 0) scale(1.05) !important;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.3);
     }
 
-    .card-stack {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+    .card:not(.active) {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
     }
   </style>
 </head>
 <body>
-
-  <header>
-    <h1 class="title">Wallet</h1>
-    <div class="control-btn" id="addBtn">
-      <svg viewBox="0 0 24 24"><path d="M19 11h-6V5a1 1 0 0 0-2 0v6H5a1 1 0 0 0 0 2h6v6a1 1 0 0 0 2 0v-6h6a1 1 0 0 0 0-2z"/></svg>
-    </div>
-  </header>
-
-  <button id="done-btn">Done</button>
-
-  <div class="wallet-container">
-    <div id="creditSection" class="section"></div>
-    <div id="loyaltySection" class="section loyalty"></div>
-  </div>
-
-  <div class="popup">
-    <button id="addCreditBtn">Add Credit/Debit Card</button>
-    <button id="addLoyaltyBtn">Add Loyalty Card</button>
-    <button id="cancelBtn">Cancel</button>
-  </div>
+  <!-- Keep the rest of your HTML structure -->
 
   <script>
-    const STORAGE_KEY = 'walletCardsV2';
-    let creditCards = [], loyaltyCards = [];
-
-    const creditSection = document.getElementById('creditSection');
-    const loyaltySection = document.getElementById('loyaltySection');
-
-    function loadSavedCards() {
-      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-      saved.forEach(card => createCard(card.image, card.isLoyalty, true));
-    }
-
-    function saveCards() {
-      const allCards = [
-        ...creditCards.map(c => ({ image: c.imageSrc, isLoyalty: false })),
-        ...loyaltyCards.map(c => ({ image: c.imageSrc, isLoyalty: true }))
-      ];
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(allCards));
-    }
-
-    function createCard(imageSrc, isLoyalty, fromStorage = false) {
+    // Modified JavaScript for better animations
+    function createCard(imageSrc) {
       const card = document.createElement('div');
       card.className = 'card';
       const img = document.createElement('img');
       img.src = imageSrc;
       card.appendChild(img);
-      const parent = isLoyalty ? loyaltySection : creditSection;
-      parent.appendChild(card);
 
+      // Store original position
+      let originalRect;
+      
       card.addEventListener('click', () => {
+        originalRect = card.getBoundingClientRect();
+        
+        // Set initial position
+        card.style.position = 'fixed';
+        card.style.width = `${originalRect.width}px`;
+        card.style.left = `${originalRect.left}px`;
+        card.style.top = `${originalRect.top}px`;
+        
+        // Trigger reflow
+        void card.offsetWidth;
+        
+        // Animate to active state
         card.classList.add('active');
-        document.getElementById('done-btn').classList.add('visible');
-        document.querySelector('header').style.opacity = '0.5';
+        card.style.width = '90%';
+        card.style.left = '50%';
+        card.style.top = '151px';
+        card.style.transform = 'translateX(-50%)';
+
+        // Animate other cards
         document.querySelectorAll('.card:not(.active)').forEach(c => {
           c.style.opacity = '0';
+          c.style.transform = 'scale(0.9)';
           c.style.pointerEvents = 'none';
         });
+        
+        document.querySelector('header').classList.add('header-hidden');
+        doneBtn.classList.add('visible');
       });
 
-      const cardData = { element: card, imageSrc };
-      if (isLoyalty) loyaltyCards.push(cardData);
-      else creditCards.push(cardData);
-
-      if (!fromStorage) saveCards();
+      cardStack.appendChild(card);
+      saveCards();
     }
 
-    document.getElementById('done-btn').addEventListener('click', () => {
-      const active = document.querySelector('.card.active');
-      if (active) {
-        active.classList.remove('active');
+    doneBtn.addEventListener('click', () => {
+      const activeCard = document.querySelector('.card.active');
+      if (activeCard) {
+        // Animate back to original position
+        activeCard.style.width = `${originalRect.width}px`;
+        activeCard.style.left = `${originalRect.left}px`;
+        activeCard.style.top = `${originalRect.top}px`;
+        activeCard.style.transform = '';
+
+        setTimeout(() => {
+          activeCard.classList.remove('active');
+          activeCard.style.cssText = '';
+        }, 400);
+
+        // Restore other cards
         document.querySelectorAll('.card').forEach(c => {
           c.style.opacity = '1';
+          c.style.transform = '';
           c.style.pointerEvents = 'auto';
         });
-        document.querySelector('header').style.opacity = '1';
-        document.getElementById('done-btn').classList.remove('visible');
+        
+        document.querySelector('header').classList.remove('header-hidden');
+        doneBtn.classList.remove('visible');
       }
     });
 
-    document.getElementById('addBtn').addEventListener('click', () => {
-      document.querySelector('.popup').classList.add('visible');
-    });
-
-    document.getElementById('cancelBtn').addEventListener('click', () => {
-      document.querySelector('.popup').classList.remove('visible');
-    });
-
-    document.getElementById('addCreditBtn').addEventListener('click', () => {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = 'image/*';
-      input.onchange = e => {
-        const reader = new FileReader();
-        reader.onload = () => createCard(reader.result, false);
-        reader.readAsDataURL(e.target.files[0]);
-      };
-      input.click();
-      document.querySelector('.popup').classList.remove('visible');
-    });
-
-    document.getElementById('addLoyaltyBtn').addEventListener('click', () => {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = 'image/*';
-      input.onchange = e => {
-        const reader = new FileReader();
-        reader.onload = () => createCard(reader.result, true);
-        reader.readAsDataURL(e.target.files[0]);
-      };
-      input.click();
-      document.querySelector('.popup').classList.remove('visible');
-    });
-
-    loadSavedCards();
+    // Keep the rest of your JavaScript
   </script>
 </body>
 </html>
