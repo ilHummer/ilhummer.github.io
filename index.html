@@ -93,11 +93,12 @@
 
         .card.active {
             position: fixed;
-            top: 50%;
+            top: 120px; /* 4 inches below Done button */
             left: 50%;
-            transform: translate(-50%, -50%) scale(1.1);
+            transform: translateX(-50%);
             z-index: 1000;
             max-width: 95%;
+            width: 90%;
             transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
         }
 
@@ -173,24 +174,43 @@
     </div>
 
     <script>
+        // Local storage keys
+        const STORAGE_KEY = 'walletCards';
         let creditCards = [];
         let loyaltyCards = [];
         const CARD_OFFSET = 60;
 
+        // Load saved cards on startup
+        function loadSavedCards() {
+            const savedCards = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            savedCards.forEach(card => {
+                createCard(card.image, card.isLoyalty, true);
+            });
+        }
+
+        // Save cards to localStorage
+        function saveCards() {
+            const allCards = [
+                ...creditCards.map(card => ({ image: card.imageSrc, isLoyalty: false })),
+                ...loyaltyCards.map(card => ({ image: card.imageSrc, isLoyalty: true }))
+            ];
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(allCards));
+        }
+
         function updateCardPositions() {
             creditCards.forEach((card, index) => {
-                card.style.top = `${index * CARD_OFFSET}px`;
-                card.style.zIndex = index + 1;
+                card.element.style.top = `${index * CARD_OFFSET}px`;
+                card.element.style.zIndex = index + 1;
             });
 
             loyaltyCards.forEach((card, index) => {
                 const basePosition = creditCards.length * CARD_OFFSET + 200;
-                card.style.top = `${basePosition + index * CARD_OFFSET}px`;
-                card.style.zIndex = creditCards.length + index + 1;
+                card.element.style.top = `${basePosition + index * CARD_OFFSET}px`;
+                card.element.style.zIndex = creditCards.length + index + 1;
             });
         }
 
-        function createCard(imageSrc, isLoyalty) {
+        function createCard(imageSrc, isLoyalty, fromStorage = false) {
             const section = isLoyalty ? document.getElementById('loyaltySection') 
                                     : document.getElementById('creditSection');
             const card = document.createElement('div');
@@ -202,6 +222,11 @@
             card.appendChild(img);
             section.appendChild(card);
 
+            const cardData = {
+                element: card,
+                imageSrc: imageSrc
+            };
+
             card.addEventListener('click', () => {
                 document.querySelectorAll('.card').forEach(c => c.style.display = 'none');
                 card.style.display = 'block';
@@ -211,11 +236,12 @@
             });
 
             if (isLoyalty) {
-                loyaltyCards.push(card);
+                loyaltyCards.push(cardData);
             } else {
-                creditCards.push(card);
+                creditCards.push(cardData);
             }
 
+            if (!fromStorage) saveCards();
             updateCardPositions();
         }
 
@@ -230,7 +256,10 @@
             updateCardPositions();
         });
 
-        // Rest of the event listeners
+        // Initialize
+        loadSavedCards();
+
+        // Event listeners
         document.getElementById('addBtn').addEventListener('click', () => {
             document.querySelector('.popup').classList.add('visible');
         });
@@ -245,7 +274,9 @@
             input.accept = 'image/*';
             input.onchange = e => {
                 const reader = new FileReader();
-                reader.onload = () => createCard(reader.result, false);
+                reader.onload = () => {
+                    createCard(reader.result, false);
+                };
                 reader.readAsDataURL(e.target.files[0]);
             };
             input.click();
@@ -258,7 +289,9 @@
             input.accept = 'image/*';
             input.onchange = e => {
                 const reader = new FileReader();
-                reader.onload = () => createCard(reader.result, true);
+                reader.onload = () => {
+                    createCard(reader.result, true);
+                };
                 reader.readAsDataURL(e.target.files[0]);
             };
             input.click();
