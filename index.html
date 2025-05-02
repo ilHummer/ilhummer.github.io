@@ -1,34 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Wallet</title>
-  <link rel="stylesheet" href="style.css" />
-  <!-- Favicon Links -->
-  <link rel="apple-touch-icon" href="icon.png">
-  <link rel="icon" type="image/png" href="icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apple Wallet Replica</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="icon.png" type="image/png">
 </head>
 <body>
-  <!-- Rest of your existing HTML remains the same -->
-  <header>
-    <h1 class="title">Wallet</h1>
-    <div class="controls">
-      <div class="control-btn" id="addBtn">+</div>
-      <div class="control-btn">...</div>
+    <h1>My Wallet</h1>
+    <div class="wallet">
+        <img src="card1.png" alt="Card 1">
+        <img src="card2.png" alt="Card 2">
+        <img src="card3.png" alt="Card 3">
+        <!-- Add more images/cards as needed -->
     </div>
-  </header>
-
-  <div id="cardContainer"></div>
-
-  <button id="done-btn">Done</button>
-
-  <div id="popup" class="popup hidden">
-    <button id="addCreditBtn">Add Credit/Debit Card</button>
-    <button id="addLoyaltyBtn">Add Loyalty Card</button>
-    <button id="cancelBtn">Cancel</button>
-  </div>
-
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
