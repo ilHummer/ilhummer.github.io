@@ -1,33 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Wallet">
-  <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="style.css" />
-  <title>Wallet</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <title>Wallet</title>
 </head>
 <body>
-  <div class="app">
-    <header>
-      <h1>Wallet</h1>
-    </header>
+    <div class="wallet-header">
+        <h1 class="wallet-title">Wallet</h1>
+        <div class="wallet-actions">
+            <input type="file" id="image-upload" accept="image/*" style="display: none;">
+            <button id="add-card" title="Add Card">+</button>
+            <button id="more-options" title="More Options">⋯</button>
+        </div>
+    </div>
 
-    <main id="cardContainer">
-      <!-- Cards will appear here -->
-    </main>
+    <div class="cards-section">
+        <div id="credit-cards" class="card-stack"></div>
+    </div>
 
-    <footer>
-      <label class="upload-button">
-        Add Card
-        <input type="file" accept="image/*" id="cardUploader" />
-      </label>
-    </footer>
-  </div>
+    <div class="loyalty-section">
+        <div id="loyalty-cards" class="card-stack"></div>
+    </div>
 
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
