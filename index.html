@@ -58,6 +58,21 @@
             transition: all 0.3s ease;
         }
 
+        .control-btn.outline {
+            background: transparent;
+            border: 1px solid white;
+        }
+
+        .control-btn.outline svg {
+            fill: white;
+        }
+
+        .control-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: #000;
+        }
+
         .card-stack {
             position: relative;
             margin-top: 80px;
@@ -103,16 +118,6 @@
             object-fit: cover;
         }
 
-        .expanded-view {
-            position: fixed;
-            top: 15%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 400px;
-            z-index: 1000;
-        }
-
         .popup {
             position: fixed;
             bottom: 0;
@@ -146,7 +151,16 @@
     <header>
         <h1 class="title">Wallet</h1>
         <div class="controls">
+            <!-- Add Button (Three Dots) -->
             <div class="control-btn" id="addBtn">
+                <svg viewBox="0 0 24 24">
+                    <circle cx="12" cy="5" r="2"/>
+                    <circle cx="12" cy="12" r="2"/>
+                    <circle cx="12" cy="19" r="2"/>
+                </svg>
+            </div>
+            <!-- Menu Button (Plus Icon) -->
+            <div class="control-btn outline" id="menuBtn">
                 <svg viewBox="0 0 24 24">
                     <path d="M19 11h-6V5a1 1 0 0 0-2 0v6H5a1 1 0 0 0 0 2h6v6a1 1 0 0 0 2 0v-6h6a1 1 0 0 0 0-2z"/>
                 </svg>
@@ -171,7 +185,7 @@
         const cardStack = document.querySelector('.card-stack');
         const popup = document.querySelector('.popup');
         let cardCount = 0;
-        const CARD_OFFSET = 110; // Half of card height
+        const CARD_OFFSET = 110;
 
         function positionCards() {
             document.querySelectorAll('.credit-card').forEach((card, index) => {
@@ -185,7 +199,6 @@
             header.classList.toggle('header-hidden', currentScroll > lastScroll);
             lastScroll = currentScroll;
             
-            // Animate cards on scroll
             document.querySelectorAll('.credit-card').forEach((card, index) => {
                 const rect = card.getBoundingClientRect();
                 const scale = 1 - (Math.abs(rect.top) * 0.001;
@@ -218,7 +231,12 @@
             });
         }
 
+        // Event Listeners
         document.getElementById('addBtn').addEventListener('click', () => popup.classList.add('visible'));
+        document.getElementById('menuBtn').addEventListener('click', () => {
+            // Add menu functionality here
+            alert('Menu button clicked');
+        });
         document.getElementById('cancelBtn').addEventListener('click', () => popup.classList.remove('visible'));
 
         document.getElementById('addCreditBtn').addEventListener('click', () => {
