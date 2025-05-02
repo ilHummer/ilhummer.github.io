@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link rel="stylesheet" href="style.css" />
-    <link rel="manifest" href="manifest.json" />
     <title>Wallet</title>
 </head>
 <body>
@@ -13,17 +12,14 @@
         <div class="wallet-actions">
             <input type="file" id="image-upload" accept="image/*" style="display: none;" />
             <button id="add-card" title="Add Card">+</button>
-            <button id="more-options" title="More Options">⋯</button>
+            <button title="More Options">⋯</button>
         </div>
     </div>
 
-    <div class="cards-section">
-        <div id="credit-cards" class="card-stack"></div>
-    </div>
+    <button id="done-btn">Done</button>
 
-    <div class="loyalty-section">
-        <div id="loyalty-cards" class="card-stack"></div>
-    </div>
+    <div class="card-container" id="credit-container"></div>
+    <div class="card-container" id="loyalty-container"></div>
 
     <!-- Modal -->
     <div id="card-popup" class="popup hidden">
