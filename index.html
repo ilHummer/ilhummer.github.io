@@ -1,35 +1,270 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Wallet</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon.png">
+  <style>
+    /* Reset and Base Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      color: white;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Header Styles */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 1rem;
+      position: relative;
+      z-index: 100;
+    }
+
+    .title {
+      font-size: 98px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+    }
+
+    .control-btn {
+      width: 60px;
+      height: 60px;
+      background: white;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      cursor: pointer;
+    }
+
+    #addBtn::after {
+      content: "+";
+      font-size: 42px;
+      font-weight: 300;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .control-btn:last-child::after {
+      content: "⋯";
+      font-size: 56px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      line-height: 0;
+    }
+
+    /* Card Container */
+    #cardContainer {
+      position: relative;
+      margin: 0 auto;
+      width: 94%;
+      height: calc(100vh - 140px);
+    }
+
+    .card {
+      position: absolute;
+      width: 100%;
+      height: auto;
+      border-radius: 16px;
+      overflow: hidden;
+      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), 
+                  top 0.3s cubic-bezier(0.4,0,0.2,1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .card img {
+      width: 100%;
+      display: block;
+    }
+
+    /* Active Card State */
+    .card.active {
+      position: fixed;
+      top: 20px;
+      left: 0;
+      right: 0;
+      margin: 0 auto;
+      width: 96%;
+      z-index: 1000;
+      transform: none !important;
+    }
+
+    /* Done Button */
+    #done-btn {
+      position: fixed;
+      top: 24px;
+      left: 24px;
+      color: white;
+      font-size: 20px;
+      font-weight: 600;
+      background: transparent;
+      border: none;
+      z-index: 1001;
+      display: none;
+      cursor: pointer;
+    }
+
+    #done-btn.visible {
+      display: block;
+    }
+
+    /* Add Card Popup */
+    .popup {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #1c1c1e;
+      padding: 1.5rem 1rem;
+      border-radius: 24px 24px 0 0;
+      z-index: 1000;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+    }
+
+    .popup.visible {
+      transform: translateY(0);
+    }
+
+    .popup button {
+      width: 100%;
+      padding: 1.2rem;
+      background: #363638;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 18px;
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-
-  <!-- Header -->
   <header>
     <h1 class="title">Wallet</h1>
     <div class="controls">
-      <div class="control-btn" id="addBtn">+</div>
-      <div class="control-btn">...</div>
+      <div class="control-btn" id="addBtn"></div>
+      <div class="control-btn"></div>
     </div>
   </header>
 
-  <!-- Card Container -->
   <div id="cardContainer"></div>
-
-  <!-- Done Button -->
   <button id="done-btn">Done</button>
 
-  <!-- Popup for Card Type -->
-  <div id="popup" class="popup hidden">
+  <div id="popup" class="popup">
     <button id="addCreditBtn">Add Credit/Debit Card</button>
     <button id="addLoyaltyBtn">Add Loyalty Card</button>
     <button id="cancelBtn">Cancel</button>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    const cards = [];
+    let cardZIndex = 1;
+
+    // Elements
+    const addBtn = document.getElementById('addBtn');
+    const popup = document.getElementById('popup');
+    const cardContainer = document.getElementById('cardContainer');
+    const doneBtn = document.getElementById('done-btn');
+
+    // Create Card Element
+    function createCard(imageSrc, isLoyalty) {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.style.zIndex = cardZIndex++;
+      card.style.transform = `translateY(${cardZIndex * 12}px)`;
+
+      const img = document.createElement('img');
+      img.src = imageSrc;
+      card.appendChild(img);
+
+      // Add to appropriate position
+      if(isLoyalty) {
+        cards.push(card);
+      } else {
+        cards.unshift(card);
+      }
+      
+      cardContainer.append(...cards.map(c => {
+        c.style.transform = `translateY(${(cards.indexOf(c) + 1) * 12}px)`;
+        return c;
+      }));
+
+      // Click Handler
+      card.addEventListener('click', () => {
+        document.querySelectorAll('.card').forEach(c => c.style.display = 'none');
+        card.style.display = 'block';
+        card.classList.add('active');
+        document.querySelector('header').style.display = 'none';
+        doneBtn.classList.add('visible');
+      });
+    }
+
+    // Image Upload Handler
+    function handleImageUpload(isLoyalty) {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.onchange = e => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onload = () => createCard(reader.result, isLoyalty);
+        reader.readAsDataURL(file);
+      };
+      input.click();
+    }
+
+    // Event Listeners
+    addBtn.addEventListener('click', () => popup.classList.add('visible'));
+    
+    document.getElementById('addCreditBtn').addEventListener('click', () => {
+      popup.classList.remove('visible');
+      handleImageUpload(false);
+    });
+
+    document.getElementById('addLoyaltyBtn').addEventListener('click', () => {
+      popup.classList.remove('visible');
+      handleImageUpload(true);
+    });
+
+    document.getElementById('cancelBtn').addEventListener('click', () => {
+      popup.classList.remove('visible');
+    });
+
+    doneBtn.addEventListener('click', () => {
+      document.querySelectorAll('.card').forEach(c => {
+        c.style.display = 'block';
+        c.classList.remove('active');
+      });
+      document.querySelector('header').style.display = 'flex';
+      doneBtn.classList.remove('visible');
+    });
+  </script>
 </body>
 </html>
