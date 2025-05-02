@@ -3,6 +3,7 @@ const imageUpload = document.getElementById("image-upload");
 const popup = document.getElementById("card-popup");
 const popupButtons = document.querySelectorAll(".popup-btn");
 const closePopup = document.querySelector(".popup-close");
+const doneBtn = document.getElementById("done-btn");
 
 let selectedType = "";
 
@@ -18,6 +19,10 @@ popupButtons.forEach((btn) => {
     });
 });
 
+closePopup.addEventListener("click", () => {
+    popup.classList.add("hidden");
+});
+
 imageUpload.addEventListener("change", function () {
     const file = this.files[0];
     if (file && selectedType) {
@@ -26,17 +31,41 @@ imageUpload.addEventListener("change", function () {
             const card = document.createElement("div");
             card.className = "card";
             card.style.backgroundImage = `url('${e.target.result}')`;
-            if (selectedType === "credit") {
-                document.getElementById("credit-cards").appendChild(card);
-            } else {
-                document.getElementById("loyalty-cards").appendChild(card);
-            }
+
+            card.addEventListener("click", () => {
+                expandCard(card);
+            });
+
+            const container = selectedType === "credit"
+                ? document.getElementById("credit-container")
+                : document.getElementById("loyalty-container");
+
+            const cardIndex = container.children.length;
+            card.style.setProperty("--i", cardIndex);
+            container.appendChild(card);
+
+            selectedType = "";
         };
         reader.readAsDataURL(file);
-        selectedType = ""; // reset
     }
 });
 
-closePopup.addEventListener("click", () => {
-    popup.classList.add("hidden");
+function expandCard(card) {
+    const allCards = document.querySelectorAll(".card");
+    allCards.forEach(c => {
+        if (c !== card) c.style.display = "none";
+    });
+
+    card.classList.add("expanded");
+    doneBtn.style.display = "block";
+}
+
+doneBtn.addEventListener("click", () => {
+    const allCards = document.querySelectorAll(".card");
+    allCards.forEach((c, index) => {
+        c.classList.remove("expanded");
+        c.style.display = "block";
+        c.style.setProperty("--i", index);
+    });
+    doneBtn.style.display = "none";
 });
