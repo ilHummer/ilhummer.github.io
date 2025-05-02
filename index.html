@@ -1,20 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>Apple Wallet Clone</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background: #000;
-      color: white;
       font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #000;
+      color: #fff;
       height: 100vh;
       overflow: hidden;
     }
@@ -26,89 +22,27 @@
       padding: 1rem;
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      z-index: 100;
       background: #000;
-      transition: all 0.3s ease;
+      z-index: 100;
     }
 
-    .header-hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .title {
-      font-size: 42px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-    }
-
-    .controls {
-      display: flex;
-      gap: 12px;
-    }
+    .title { font-size: 28px; font-weight: 700; }
 
     .control-btn {
       width: 44px;
       height: 44px;
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255,255,255,0.9);
       border-radius: 22px;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       cursor: pointer;
-      transition: transform 0.2s ease;
-    }
-
-    .control-btn:active {
-      transform: scale(0.95);
     }
 
     .control-btn svg {
       width: 24px;
       height: 24px;
       fill: #000;
-    }
-
-    .card-stack {
-      margin-top: 100px;
-      height: calc(100vh - 120px);
-      overflow-y: auto;
-      padding: 0 20px;
-      position: relative;
-    }
-
-    .card {
-      width: 100%;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      margin-top: -20%;
-      background: #222;
-      z-index: 1;
-    }
-
-    .card:first-child {
-      margin-top: 0;
-    }
-
-    .card img {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
-
-    .card.active {
-      position: fixed !important;
-      top: 151px !important;
-      left: 50% !important;
-      transform: translateX(-50%) scale(1.02) !important;
-      z-index: 1000 !important;
-      width: calc(100% - 40px) !important;
-      margin: 0 !important;
-      transition: all 0.35s ease !important;
     }
 
     #done-btn {
@@ -119,17 +53,13 @@
       background: transparent;
       color: white;
       border: none;
-      padding: 0;
       font-size: 20px;
       font-weight: 600;
       display: none;
       cursor: pointer;
-      transition: opacity 0.3s ease;
     }
 
-    #done-btn.visible {
-      display: block;
-    }
+    #done-btn.visible { display: block; }
 
     .popup {
       position: fixed;
@@ -137,113 +67,156 @@
       left: 0;
       right: 0;
       background: #1c1c1e;
-      padding: 1.5rem;
-      border-radius: 24px 24px 0 0;
+      padding: 1rem;
+      border-radius: 20px 20px 0 0;
       transform: translateY(100%);
       transition: transform 0.3s ease;
       z-index: 1000;
     }
 
-    .popup.visible {
-      transform: translateY(0);
-    }
+    .popup.visible { transform: translateY(0); }
 
     .popup button {
       width: 100%;
       padding: 1rem;
-      background: #363638;
-      color: white;
+      background: #2a2a2d;
       border: none;
+      color: #fff;
       border-radius: 12px;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       cursor: pointer;
-      transition: transform 0.2s ease;
     }
 
-    .popup button:active {
-      transform: scale(0.98);
+    .wallet-container {
+      margin-top: 80px;
+      padding: 0 10px 50px 10px;
+      height: calc(100vh - 80px);
+      overflow-y: auto;
     }
 
-    /* Loyalty Section Title */
-    .section-title {
-      font-size: 20px;
-      font-weight: 500;
-      margin: 10px 20px 30px;
-      color: #aaa;
+    .section {
+      position: relative;
+    }
+
+    .section.loyalty {
+      margin-top: 150px; /* Spaced below main cards */
+    }
+
+    .card {
+      position: relative;
+      width: 90%;
+      margin: 0 auto;
+      margin-bottom: -15%; /* Overlap */
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      transition: all 0.4s ease;
+      z-index: 1;
+      cursor: pointer;
+    }
+
+    .card img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .card.active {
+      position: fixed !important;
+      top: 151px;
+      left: 50%;
+      transform: translateX(-50%) scale(1.05);
+      width: 90%;
+      z-index: 1001;
+      margin-bottom: 0;
+      transition: top 0.4s ease, transform 0.4s ease;
+    }
+
+    .card-stack {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
   </style>
 </head>
 <body>
+
   <header>
     <h1 class="title">Wallet</h1>
-    <div class="controls">
-      <div class="control-btn" id="addBtn">
-        <svg viewBox="0 0 24 24">
-          <path d="M19 11h-6V5a1 1 0 0 0-2 0v6H5a1 1 0 0 0 0 2h6v6a1 1 0 0 0 2 0v-6h6a1 1 0 0 0 0-2z"/>
-        </svg>
-      </div>
+    <div class="control-btn" id="addBtn">
+      <svg viewBox="0 0 24 24"><path d="M19 11h-6V5a1 1 0 0 0-2 0v6H5a1 1 0 0 0 0 2h6v6a1 1 0 0 0 2 0v-6h6a1 1 0 0 0 0-2z"/></svg>
     </div>
   </header>
 
-  <div class="section-title">Loyalty Cards</div>
-  <div class="card-stack" id="cardStack"></div>
   <button id="done-btn">Done</button>
 
+  <div class="wallet-container">
+    <div id="creditSection" class="section"></div>
+    <div id="loyaltySection" class="section loyalty"></div>
+  </div>
+
   <div class="popup">
-    <button id="addCreditBtn">Add Card</button>
+    <button id="addCreditBtn">Add Credit/Debit Card</button>
+    <button id="addLoyaltyBtn">Add Loyalty Card</button>
     <button id="cancelBtn">Cancel</button>
   </div>
 
   <script>
-    const STORAGE_KEY = 'walletCards';
-    const cardStack = document.getElementById('cardStack');
-    const doneBtn = document.getElementById('done-btn');
+    const STORAGE_KEY = 'walletCardsV2';
+    let creditCards = [], loyaltyCards = [];
+
+    const creditSection = document.getElementById('creditSection');
+    const loyaltySection = document.getElementById('loyaltySection');
 
     function loadSavedCards() {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-      saved.forEach(src => createCard(src));
+      saved.forEach(card => createCard(card.image, card.isLoyalty, true));
     }
 
     function saveCards() {
-      const images = [...document.querySelectorAll('.card img')].map(img => img.src);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(images));
+      const allCards = [
+        ...creditCards.map(c => ({ image: c.imageSrc, isLoyalty: false })),
+        ...loyaltyCards.map(c => ({ image: c.imageSrc, isLoyalty: true }))
+      ];
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(allCards));
     }
 
-    function createCard(imageSrc) {
+    function createCard(imageSrc, isLoyalty, fromStorage = false) {
       const card = document.createElement('div');
       card.className = 'card';
-
       const img = document.createElement('img');
       img.src = imageSrc;
-
       card.appendChild(img);
-      cardStack.appendChild(card);
+      const parent = isLoyalty ? loyaltySection : creditSection;
+      parent.appendChild(card);
 
       card.addEventListener('click', () => {
-        if (card.classList.contains('active')) return;
-
         card.classList.add('active');
-        document.querySelectorAll('.card').forEach(c => {
-          if (c !== card) {
-            c.style.opacity = '0';
-            c.style.pointerEvents = 'none';
-          }
+        document.getElementById('done-btn').classList.add('visible');
+        document.querySelector('header').style.opacity = '0.5';
+        document.querySelectorAll('.card:not(.active)').forEach(c => {
+          c.style.opacity = '0';
+          c.style.pointerEvents = 'none';
         });
-        document.querySelector('header').classList.add('header-hidden');
-        doneBtn.classList.add('visible');
       });
+
+      const cardData = { element: card, imageSrc };
+      if (isLoyalty) loyaltyCards.push(cardData);
+      else creditCards.push(cardData);
+
+      if (!fromStorage) saveCards();
     }
 
-    doneBtn.addEventListener('click', () => {
-      const activeCard = document.querySelector('.card.active');
-      if (activeCard) {
-        activeCard.classList.remove('active');
+    document.getElementById('done-btn').addEventListener('click', () => {
+      const active = document.querySelector('.card.active');
+      if (active) {
+        active.classList.remove('active');
         document.querySelectorAll('.card').forEach(c => {
           c.style.opacity = '1';
           c.style.pointerEvents = 'auto';
         });
-        document.querySelector('header').classList.remove('header-hidden');
-        doneBtn.classList.remove('visible');
+        document.querySelector('header').style.opacity = '1';
+        document.getElementById('done-btn').classList.remove('visible');
       }
     });
 
@@ -261,10 +234,20 @@
       input.accept = 'image/*';
       input.onchange = e => {
         const reader = new FileReader();
-        reader.onload = () => {
-          createCard(reader.result);
-          saveCards();
-        };
+        reader.onload = () => createCard(reader.result, false);
+        reader.readAsDataURL(e.target.files[0]);
+      };
+      input.click();
+      document.querySelector('.popup').classList.remove('visible');
+    });
+
+    document.getElementById('addLoyaltyBtn').addEventListener('click', () => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.onchange = e => {
+        const reader = new FileReader();
+        reader.onload = () => createCard(reader.result, true);
         reader.readAsDataURL(e.target.files[0]);
       };
       input.click();
