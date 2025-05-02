@@ -9,7 +9,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon.png">
   <style>
-    /* === INLINE CSS === */
+    /* === UPDATED CSS === */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { 
       background: #000; 
@@ -25,6 +25,8 @@
       align-items: center;
       padding: 1rem;
       height: 80px;
+      position: relative;
+      z-index: 100;
     }
 
     .title {
@@ -48,6 +50,7 @@
     .control-btn img {
       width: 24px;
       height: 24px;
+      display: block; /* Fix icon visibility */
     }
 
     #cardContainer {
@@ -60,11 +63,13 @@
     .card {
       width: 100%;
       max-width: 375px;
-      margin: 0 auto 30px;
+      margin: 0 auto;
       border-radius: 12px;
       overflow: hidden;
       transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
-      position: relative;
+      position: absolute;
+      left: 0;
+      right: 0;
     }
 
     .card[data-type="credit"] { aspect-ratio: 1084/684; }
@@ -76,19 +81,17 @@
       object-fit: cover;
     }
 
-    .card:not(:first-child) {
-      position: absolute;
-      top: 30px;
-      transform: translateY(-50%) scale(0.98);
-      z-index: -1;
+    .card:not(.active) {
+      transform: translateY(var(--offset)) scale(0.98);
+      z-index: calc(100 - var(--index));
     }
 
     .card.active {
       position: fixed;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 1000;
+      transform: translate(-50%, -50%)!important;
+      z-index: 999;
       max-height: 80vh;
       width: 94%;
     }
@@ -101,7 +104,7 @@
       font-size: 20px;
       background: transparent;
       border: none;
-      z-index: 1001;
+      z-index: 1000; /* Higher than cards */
       display: none;
     }
 
@@ -117,6 +120,7 @@
       border-radius: 24px 24px 0 0;
       transform: translateY(100%);
       transition: transform 0.3s ease;
+      z-index: 1000;
     }
 
     .popup.visible { transform: translateY(0); }
@@ -136,11 +140,9 @@
     <h1 class="title">Wallet</h1>
     <div class="controls">
       <div class="control-btn" id="addBtn">
-        <!-- Embedded Plus Icon -->
         <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAkElEQVR4nO2UMQ6AIAxFPYkHcHNP4uYhPIKbehJP4sYJXNTGRWmiEIR+WlrkLS3l8QkF/kuAeQB4BQTA2BkHMLQqXhVY0jQ7k0s7wK4EeE0eGxM5Zg9oHtB8wKcBc0r6M0D0gJ0DlD0gO4B7QPEB1QHCA5QDlAdIDpAdoDlAcYDqAM0BmgN0B+gOMD7APB0J6B7gHwAAAABJRU5ErkJggg==" alt="+">
       </div>
       <div class="control-btn">
-        <!-- Embedded Dots Icon -->
         <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAi0lEQVR4nO2UMQrAIAxFPYmXcHNP4uYhPIKbehJP4sYJXNTGRWmiEIR+WlrkLS3l8QkFvifAPAA8AgJgbI0D6FsVjwosaZqNyaUdYFEC3CaPjYkcswM0B2gO0BygOUBzgOYA1QGaAzQHaA7QHKA5QHGA4gDFAYoDFAcoDlAcoDhAcYDiAMUBigM0B+gO0P8A83Qk1C9jqy8AAAAASUVORK5CYII=" alt="⋯">
       </div>
     </div>
@@ -156,9 +158,16 @@
   </div>
 
   <script>
-    // === INLINE JAVASCRIPT ===
-    let cardStack = [];
+    // === UPDATED JAVASCRIPT ===
+    let cards = [];
     const CARD_OFFSET = 30;
+
+    function updateCardPositions() {
+      cards.forEach((card, index) => {
+        card.style.setProperty('--offset', `${index * CARD_OFFSET}px`);
+        card.style.setProperty('--index', index);
+      });
+    }
 
     document.getElementById('addBtn').addEventListener('click', () => {
       document.getElementById('popup').classList.add('visible');
@@ -171,10 +180,11 @@
     });
 
     document.getElementById('done-btn').addEventListener('click', () => {
-      document.querySelectorAll('.card').forEach(card => {
+      cards.forEach(card => {
         card.classList.remove('active');
-        card.style.transform = '';
+        card.style.display = 'block';
       });
+      updateCardPositions();
       document.querySelector('header').style.display = 'flex';
       document.getElementById('done-btn').classList.remove('visible');
     });
@@ -198,22 +208,18 @@
         img.src = e.target.result;
         card.appendChild(img);
 
-        card.style.transform = `translateY(${cardStack.length * CARD_OFFSET}px)`;
-        card.style.zIndex = cardStack.length + 1;
-        
         card.addEventListener('click', () => {
-          cardStack.forEach(c => {
-            c.style.transform = c === card 
-              ? 'translateY(0) scale(1)' 
-              : `translateY(-${CARD_OFFSET}px) scale(0.9)`;
-            c.style.zIndex = c === card ? 1000 : 1;
+          cards.forEach(c => {
+            c.style.display = c === card ? 'block' : 'none';
           });
+          card.classList.add('active');
           document.querySelector('header').style.display = 'none';
           document.getElementById('done-btn').classList.add('visible');
         });
 
-        cardStack.push(card);
+        cards.push(card);
         document.getElementById('cardContainer').appendChild(card);
+        updateCardPositions();
         document.getElementById('popup').classList.remove('visible');
       };
       reader.readAsDataURL(file);
