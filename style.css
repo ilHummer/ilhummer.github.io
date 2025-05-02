@@ -1,154 +1,98 @@
-/* Reset and Base Styles */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  background: #000;
-  color: white;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  height: 100vh;
-  overflow: hidden;
-}
-
-/* Header Styles */
+/* Header Adjustments */
 header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.5rem 1rem;
-  position: relative;
-  z-index: 100;
+  padding: 1rem;
+  height: 80px;
 }
 
 .title {
-  font-size: 98px;
+  font-size: 34px; /* Standard iOS header size */
   font-weight: 700;
-  letter-spacing: -0.04em;
-  line-height: 1;
-  white-space: nowrap;
 }
 
 .controls {
-  display: flex;
-  gap: 12px;
+  gap: 8px;
 }
 
 .control-btn {
-  width: 60px;
-  height: 60px;
-  background: white;
-  border-radius: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  cursor: pointer;
+  width: 44px; /* Standard iOS button size */
+  height: 44px;
 }
 
-#addBtn::after {
-  content: "+";
-  font-size: 42px;
-  font-weight: 300;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+/* Icon Images */
+#addBtn img,
+.control-btn:last-child img {
+  width: 24px;
+  height: 24px;
+  display: block;
 }
 
-.control-btn:last-child::after {
-  content: "⋯";
-  font-size: 56px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  line-height: 0;
-}
-
-/* Card Container */
+/* Card Stacking */
 #cardContainer {
-  position: relative;
-  margin: 0 auto;
-  width: 94%;
-  height: calc(100vh - 140px);
+  width: 100%;
+  padding: 0 12px;
+  height: calc(100vh - 100px);
+  overflow-y: auto;
 }
 
 .card {
-  position: absolute;
   width: 100%;
-  height: auto;
-  border-radius: 16px;
-  overflow: hidden;
-  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), 
-              top 0.3s cubic-bezier(0.4,0,0.2,1);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  max-width: 375px; /* iPhone screen width */
+  margin: 0 auto;
+  position: relative;
+  transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+  transform-origin: center top;
+}
+
+/* Credit Card Dimensions */
+.card[data-type="credit"] {
+  height: 0;
+  padding-bottom: 60%; /* 1084x684 aspect ratio */
+}
+
+/* Loyalty Card Dimensions */
+.card[data-type="loyalty"] {
+  height: 0;
+  padding-bottom: 140%; /* 1066x1491 aspect ratio */
 }
 
 .card img {
+  position: absolute;
   width: 100%;
-  display: block;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
 }
 
-/* Active Card State */
+/* Stacking Effect */
+.card:not(:first-child) {
+  position: absolute;
+  top: 30px; /* Half card overlap */
+  transform: translateY(-50%) scale(0.98);
+  z-index: -1;
+}
+
 .card.active {
   position: fixed;
-  top: 20px;
-  left: 0;
-  right: 0;
-  margin: 0 auto;
-  width: 96%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   z-index: 1000;
-  transform: none !important;
+  max-height: 80vh;
+  width: 94%;
 }
 
-/* Done Button */
-#done-btn {
-  position: fixed;
-  top: 24px;
-  left: 24px;
-  color: white;
-  font-size: 20px;
-  font-weight: 600;
-  background: transparent;
-  border: none;
-  z-index: 1001;
+/* Loyalty Card Collapsed State */
+.card[data-type="loyalty"]:not(.active) {
+  max-height: 200px; /* Show only top 20% */
+  overflow: hidden;
+}
+
+/* Scrolling Behavior */
+#cardContainer::-webkit-scrollbar {
   display: none;
-  cursor: pointer;
 }
 
-#done-btn.visible {
-  display: block;
-}
-
-/* Add Card Popup */
-.popup {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: #1c1c1e;
-  padding: 1.5rem 1rem;
-  border-radius: 24px 24px 0 0;
-  z-index: 1000;
-  transform: translateY(100%);
-  transition: transform 0.3s ease;
-}
-
-.popup.visible {
-  transform: translateY(0);
-}
-
-.popup button {
-  width: 100%;
-  padding: 1.2rem;
-  background: #363638;
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-size: 18px;
-  margin-bottom: 8px;
-  cursor: pointer;
+#cardContainer {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
 }
