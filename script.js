@@ -39,6 +39,7 @@ imageUpload.addEventListener("change", function () {
                 expandCard(card);
             });
 
+            applyTiltEffect(card);
             allCards.push(card);
             renderCardStack();
             selectedType = "";
@@ -65,6 +66,8 @@ function expandCard(card) {
     });
     card.classList.add("expanded");
     doneBtn.style.display = "block";
+    triggerVibration();
+    showNfcOverlay();
 }
 
 doneBtn.addEventListener("click", () => {
@@ -76,3 +79,43 @@ doneBtn.addEventListener("click", () => {
     renderCardStack();
     doneBtn.style.display = "none";
 });
+
+function applyTiltEffect(card) {
+    card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateY = ((x - centerX) / centerX) * 10;
+        const rotateX = -((y - centerY) / centerY) * 10;
+
+        card.style.setProperty('--rotateX', `${rotateX}deg`);
+        card.style.setProperty('--rotateY', `${rotateY}deg`);
+        card.classList.add('tilted');
+    });
+
+    card.addEventListener('mouseleave', () => {
+        card.style.setProperty('--rotateX', `0deg`);
+        card.style.setProperty('--rotateY', `0deg`);
+        card.classList.remove('tilted');
+    });
+}
+
+function triggerVibration() {
+    if (navigator.vibrate) {
+        navigator.vibrate(100);
+    }
+}
+
+function showNfcOverlay() {
+    let overlay = document.createElement('div');
+    overlay.className = 'nfc-overlay';
+    overlay.innerText = 'Scanning...';
+    document.body.appendChild(overlay);
+    overlay.style.display = 'flex';
+    setTimeout(() => {
+        overlay.style.display = 'none';
+        document.body.removeChild(overlay);
+    }, 1000);
+}
