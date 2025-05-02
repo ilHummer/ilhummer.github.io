@@ -29,7 +29,7 @@
             align-items: center;
             z-index: 100;
             background: #000;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
         }
 
         .header-hidden {
@@ -41,11 +41,13 @@
             font-size: 42px;
             font-weight: 700;
             letter-spacing: -0.5px;
+            transition: inherit;
         }
 
         .controls {
             display: flex;
             gap: 12px;
+            transition: inherit;
         }
 
         .control-btn {
@@ -57,6 +59,7 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            transition: inherit;
         }
 
         .control-btn svg {
@@ -82,7 +85,8 @@
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+            opacity: 1;
         }
 
         .card img {
@@ -93,13 +97,13 @@
 
         .card.active {
             position: fixed;
-            top: 120px; /* 4 inches below Done button */
+            top: 68px; /* 20px (done button) + 48px (2 inches) */
             left: 50%;
             transform: translateX(-50%);
             z-index: 1000;
             max-width: 95%;
             width: 90%;
-            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+            opacity: 1;
         }
 
         #done-btn {
@@ -130,7 +134,7 @@
             padding: 1.5rem;
             border-radius: 24px 24px 0 0;
             transform: translateY(100%);
-            transition: transform 0.3s ease;
+            transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
             z-index: 1000;
         }
 
@@ -147,6 +151,11 @@
             border-radius: 12px;
             margin-bottom: 8px;
             cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .popup button:active {
+            transform: scale(0.98);
         }
     </style>
 </head>
@@ -174,13 +183,11 @@
     </div>
 
     <script>
-        // Local storage keys
         const STORAGE_KEY = 'walletCards';
         let creditCards = [];
         let loyaltyCards = [];
         const CARD_OFFSET = 60;
 
-        // Load saved cards on startup
         function loadSavedCards() {
             const savedCards = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
             savedCards.forEach(card => {
@@ -188,7 +195,6 @@
             });
         }
 
-        // Save cards to localStorage
         function saveCards() {
             const allCards = [
                 ...creditCards.map(card => ({ image: card.imageSrc, isLoyalty: false })),
@@ -201,12 +207,14 @@
             creditCards.forEach((card, index) => {
                 card.element.style.top = `${index * CARD_OFFSET}px`;
                 card.element.style.zIndex = index + 1;
+                card.element.style.opacity = 1;
             });
 
             loyaltyCards.forEach((card, index) => {
                 const basePosition = creditCards.length * CARD_OFFSET + 200;
                 card.element.style.top = `${basePosition + index * CARD_OFFSET}px`;
                 card.element.style.zIndex = creditCards.length + index + 1;
+                card.element.style.opacity = 1;
             });
         }
 
@@ -228,8 +236,12 @@
             };
 
             card.addEventListener('click', () => {
-                document.querySelectorAll('.card').forEach(c => c.style.display = 'none');
-                card.style.display = 'block';
+                document.querySelectorAll('.card').forEach(c => {
+                    c.style.opacity = 0;
+                    c.style.pointerEvents = 'none';
+                });
+                card.style.opacity = 1;
+                card.style.pointerEvents = 'auto';
                 card.classList.add('active');
                 document.querySelector('header').classList.add('header-hidden');
                 document.getElementById('done-btn').classList.add('visible');
@@ -245,10 +257,10 @@
             updateCardPositions();
         }
 
-        // Done button handler
         document.getElementById('done-btn').addEventListener('click', () => {
             document.querySelectorAll('.card').forEach(card => {
-                card.style.display = 'block';
+                card.style.opacity = 1;
+                card.style.pointerEvents = 'auto';
                 card.classList.remove('active');
             });
             document.querySelector('header').classList.remove('header-hidden');
@@ -259,7 +271,6 @@
         // Initialize
         loadSavedCards();
 
-        // Event listeners
         document.getElementById('addBtn').addEventListener('click', () => {
             document.querySelector('.popup').classList.add('visible');
         });
