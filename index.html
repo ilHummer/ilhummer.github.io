@@ -61,10 +61,17 @@
         .control-btn.outline {
             background: transparent;
             border: 1px solid white;
+            position: fixed;
+            top: 24px;
+            right: 16px;
+            z-index: 1000;
+            display: none;
         }
 
         .control-btn.outline svg {
             fill: white;
+            width: 16px;
+            height: 16px;
         }
 
         .control-btn svg {
@@ -99,23 +106,47 @@
         }
 
         .loyalty-section {
-            margin-top: 180px;
+            margin-top: 180px; /* 3 inches equivalent */
         }
 
         .loyalty-card {
-            height: 80px;
+            height: 80px; /* 20% of 1066x1491 */
             aspect-ratio: 1066/1491;
             transition: height 0.3s ease;
         }
 
         .loyalty-card.expanded {
-            height: 160px;
+            height: 160px; /* 40% when scrolled */
         }
 
         .card img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+        }
+
+        .expanded-view {
+            position: fixed;
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 400px;
+            z-index: 1000;
+        }
+
+        .transactions {
+            padding: 1rem;
+            background: #1c1c1e;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #363638;
         }
 
         .popup {
@@ -152,15 +183,15 @@
         <h1 class="title">Wallet</h1>
         <div class="controls">
             <!-- Add Button (Three Dots) -->
-            <div class="control-btn" id="addBtn">
+            <div class="control-btn" id="menuBtn">
                 <svg viewBox="0 0 24 24">
                     <circle cx="12" cy="5" r="2"/>
                     <circle cx="12" cy="12" r="2"/>
                     <circle cx="12" cy="19" r="2"/>
                 </svg>
             </div>
-            <!-- Menu Button (Plus Icon) -->
-            <div class="control-btn outline" id="menuBtn">
+            <!-- Plus Button (Hidden by default) -->
+            <div class="control-btn" id="addBtn" style="display: none;">
                 <svg viewBox="0 0 24 24">
                     <path d="M19 11h-6V5a1 1 0 0 0-2 0v6H5a1 1 0 0 0 0 2h6v6a1 1 0 0 0 2 0v-6h6a1 1 0 0 0 0-2z"/>
                 </svg>
@@ -171,6 +202,15 @@
     <div class="card-stack">
         <div id="creditSection"></div>
         <div class="loyalty-section" id="loyaltySection"></div>
+    </div>
+
+    <!-- Outlined Button (Initially hidden) -->
+    <div class="control-btn outline" id="cardMenuBtn">
+        <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="5" r="2"/>
+            <circle cx="12" cy="12" r="2"/>
+            <circle cx="12" cy="19" r="2"/>
+        </svg>
     </div>
 
     <div class="popup">
@@ -187,6 +227,9 @@
         let cardCount = 0;
         const CARD_OFFSET = 110;
 
+        // Initialize outlined button as hidden
+        document.getElementById('cardMenuBtn').style.display = 'none';
+
         function positionCards() {
             document.querySelectorAll('.credit-card').forEach((card, index) => {
                 card.style.top = `${index * CARD_OFFSET}px`;
@@ -199,10 +242,17 @@
             header.classList.toggle('header-hidden', currentScroll > lastScroll);
             lastScroll = currentScroll;
             
+            // Animate credit cards
             document.querySelectorAll('.credit-card').forEach((card, index) => {
                 const rect = card.getBoundingClientRect();
                 const scale = 1 - (Math.abs(rect.top) * 0.001;
                 card.style.transform = `translateX(-50%) scale(${Math.max(scale, 0.8)})`;
+            });
+
+            // Expand loyalty cards when scrolled to
+            document.querySelectorAll('.loyalty-card').forEach(card => {
+                const rect = card.getBoundingClientRect();
+                card.classList.toggle('expanded', rect.top < window.innerHeight * 0.8);
             });
         });
 
@@ -224,20 +274,43 @@
             }
 
             card.addEventListener('click', () => {
-                cardStack.scrollTo({
-                    top: card.offsetTop - 100,
-                    behavior: 'smooth'
-                });
+                // Hide original buttons
+                document.querySelectorAll('.control-btn').forEach(btn => btn.style.display = 'none');
+                // Show outlined button
+                document.getElementById('cardMenuBtn').style.display = 'flex';
+                
+                // Create expanded view
+                const clone = card.cloneNode(true);
+                clone.classList.add('expanded-view');
+                
+                if (!isLoyalty) {
+                    const transactions = document.createElement('div');
+                    transactions.className = 'transactions';
+                    transactions.innerHTML = `
+                        <div class="transaction-item">
+                            <span>Recent Transaction</span>
+                            <span>$49.99</span>
+                        </div>
+                        <div class="transaction-item">
+                            <span>Grocery Store</span>
+                            <span>$29.99</span>
+                        </div>
+                    `;
+                    clone.appendChild(transactions);
+                }
+                
+                document.body.appendChild(clone);
             });
         }
 
         // Event Listeners
-        document.getElementById('addBtn').addEventListener('click', () => popup.classList.add('visible'));
-        document.getElementById('menuBtn').addEventListener('click', () => {
-            // Add menu functionality here
-            alert('Menu button clicked');
-        });
+        document.getElementById('menuBtn').addEventListener('click', () => popup.classList.add('visible'));
         document.getElementById('cancelBtn').addEventListener('click', () => popup.classList.remove('visible'));
+        document.getElementById('cardMenuBtn').addEventListener('click', () => {
+            document.querySelectorAll('.expanded-view').forEach(el => el.remove());
+            document.querySelectorAll('.control-btn').forEach(btn => btn.style.display = 'flex');
+            document.getElementById('cardMenuBtn').style.display = 'none';
+        });
 
         document.getElementById('addCreditBtn').addEventListener('click', () => {
             const input = document.createElement('input');
