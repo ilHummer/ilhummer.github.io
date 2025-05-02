@@ -16,6 +16,7 @@
             color: white;
             font-family: -apple-system, BlinkMacSystemFont, sans-serif;
             height: 100vh;
+            overflow: hidden;
         }
 
         header {
@@ -31,7 +32,7 @@
         }
 
         .title {
-            font-size: 42px; /* Larger text size */
+            font-size: 42px;
             font-weight: 700;
             letter-spacing: -0.5px;
         }
@@ -59,26 +60,38 @@
         }
 
         .card-stack {
+            position: relative;
             margin-top: 100px;
+            height: calc(100vh - 120px);
+            overflow-y: auto;
             padding: 20px;
         }
 
         .card {
+            position: absolute;
             width: 100%;
             max-width: 375px;
-            margin: 0 auto 16px;
+            left: 50%;
+            transform: translateX(-50%);
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            position: relative;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
         .credit-card {
-            height: 220px;
+            aspect-ratio: 1084/684;
         }
 
-        .loyalty-section {
-            margin-top: 180px;
+        .loyalty-card {
+            aspect-ratio: 1066/1491;
+            max-height: 160px;
+        }
+
+        .card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .popup {
@@ -91,7 +104,7 @@
             border-radius: 24px 24px 0 0;
             transform: translateY(100%);
             transition: transform 0.3s ease;
-            z-index: 100;
+            z-index: 1000;
         }
 
         .popup.visible {
@@ -115,15 +128,11 @@
         <h1 class="title">Wallet</h1>
         <div class="controls">
             <div class="control-btn" id="addBtn">
-                <svg viewBox="0 0 24 24">
-                    <path d="M19 11h-6V5a1 1 0 0 0-2 0v6H5a1 1 0 0 0 0 2h6v6a1 1 0 0 0 2 0v-6h6a1 1 0 0 0 0-2z"/>
-                </svg>
+                <svg viewBox="0 0 24 24"><path d="M19 11h-6V5a1 1 0 0 0-2 0v6H5a1 1 0 0 0 0 2h6v6a1 1 0 0 0 2 0v-6h6a1 1 0 0 0 0-2z"/></svg>
             </div>
             <div class="control-btn" id="menuBtn">
                 <svg viewBox="0 0 24 24">
-                    <circle cx="12" cy="5" r="2"/>
-                    <circle cx="12" cy="12" r="2"/>
-                    <circle cx="12" cy="19" r="2"/>
+                    <circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/>
                 </svg>
             </div>
         </div>
@@ -131,7 +140,7 @@
 
     <div class="card-stack">
         <div id="creditSection"></div>
-        <div class="loyalty-section" id="loyaltySection"></div>
+        <div id="loyaltySection" style="margin-top: 300px"></div>
     </div>
 
     <div class="popup">
@@ -141,42 +150,26 @@
     </div>
 
     <script>
-        // Working button functionality
-        const popup = document.querySelector('.popup');
-        const addBtn = document.getElementById('addBtn');
-        const menuBtn = document.getElementById('menuBtn');
-        const cancelBtn = document.getElementById('cancelBtn');
+        let creditCards = [];
+        let loyaltyCards = [];
+        const CARD_OFFSET = 60;
 
-        // Show popup when plus button clicked
-        addBtn.addEventListener('click', () => {
-            popup.classList.add('visible');
-        });
+        function updateCardPositions() {
+            // Credit cards stacking
+            creditCards.forEach((card, index) => {
+                card.style.setProperty('--stack-index', index);
+                card.style.top = `${index * CARD_OFFSET}px`;
+                card.style.zIndex = index + 1;
+                card.style.transform = `translateX(-50%) scale(${1 - index * 0.05})`;
+            });
 
-        // Hide popup when cancel clicked
-        cancelBtn.addEventListener('click', () => {
-            popup.classList.remove('visible');
-        });
-
-        // Add card functionality
-        document.getElementById('addCreditBtn').addEventListener('click', handleCardAdd(false));
-        document.getElementById('addLoyaltyBtn').addEventListener('click', handleCardAdd(true));
-
-        function handleCardAdd(isLoyalty) {
-            return function() {
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = 'image/*';
-                input.onchange = (e) => {
-                    const file = e.target.files[0];
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        createCard(event.target.result, isLoyalty);
-                    };
-                    reader.readAsDataURL(file);
-                };
-                input.click();
-                popup.classList.remove('visible');
-            }
+            // Loyalty cards stacking
+            loyaltyCards.forEach((card, index) => {
+                const basePosition = creditCards.length * CARD_OFFSET + 200;
+                card.style.top = `${basePosition + index * CARD_OFFSET}px`;
+                card.style.zIndex = creditCards.length + index + 1;
+                card.style.transform = `translateX(-50%) scale(${1 - index * 0.05})`;
+            });
         }
 
         function createCard(imageSrc, isLoyalty) {
@@ -187,14 +180,52 @@
             
             const img = document.createElement('img');
             img.src = imageSrc;
-            card.appendChild(img);
             
+            card.appendChild(img);
             section.appendChild(card);
+
+            if (isLoyalty) {
+                loyaltyCards.push(card);
+            } else {
+                creditCards.push(card);
+            }
+
+            updateCardPositions();
         }
 
-        // Three dots button functionality
-        menuBtn.addEventListener('click', () => {
-            alert('Menu button clicked!'); // Add your menu functionality here
+        // Event listeners
+        document.getElementById('addBtn').addEventListener('click', () => {
+            document.querySelector('.popup').classList.add('visible');
+        });
+
+        document.getElementById('cancelBtn').addEventListener('click', () => {
+            document.querySelector('.popup').classList.remove('visible');
+        });
+
+        document.getElementById('addCreditBtn').addEventListener('click', () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = e => {
+                const reader = new FileReader();
+                reader.onload = () => createCard(reader.result, false);
+                reader.readAsDataURL(e.target.files[0]);
+            };
+            input.click();
+            document.querySelector('.popup').classList.remove('visible');
+        });
+
+        document.getElementById('addLoyaltyBtn').addEventListener('click', () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = e => {
+                const reader = new FileReader();
+                reader.onload = () => createCard(reader.result, true);
+                reader.readAsDataURL(e.target.files[0]);
+            };
+            input.click();
+            document.querySelector('.popup').classList.remove('visible');
         });
     </script>
 </body>
