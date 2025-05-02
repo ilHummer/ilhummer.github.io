@@ -1,8 +1,8 @@
 body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-    background: #1c1c1e;
-    color: #f2f2f2;
+    background: #ffffff;
+    color: #000;
 }
 
 .wallet-header {
@@ -10,35 +10,40 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 16px;
-    background-color: #2c2c2e;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .wallet-title {
     margin: 0;
     font-size: 24px;
     font-weight: 600;
-    color: #ffffff;
+    color: #000;
+}
+
+.wallet-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .wallet-actions button {
-    background-color: #0a84ff;
+    background-color: #000;
     color: white;
     font-size: 20px;
     width: 36px;
     height: 36px;
     border: none;
-    border-radius: 18px;
-    margin-left: 8px;
+    border-radius: 50%;
     cursor: pointer;
 }
 
+/* Cards */
 .card-stack {
     padding: 0 16px;
     display: flex;
     flex-direction: column;
     gap: 12px;
-    transition: transform 0.3s ease;
     margin-bottom: 24px;
 }
 
@@ -47,12 +52,54 @@ body {
     background-size: cover;
     background-position: center;
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     cursor: pointer;
     transition: transform 0.3s ease;
-    border: 1px solid #3a3a3c;
+    border: 1px solid #e0e0e0;
 }
 
 .card:hover {
     transform: translateY(-2px);
 }
+
+/* Modal */
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.popup.hidden {
+    display: none;
+}
+
+.popup-box {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+}
+
+.popup-btn {
+    display: block;
+    width: 100%;
+    margin: 10px 0;
+    padding: 12px;
+    font-size: 16px;
+    border: none;
+    background: #000;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.popup-close {
+    background: transparent;
