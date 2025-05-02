@@ -4,8 +4,10 @@ const popup = document.getElementById("card-popup");
 const popupButtons = document.querySelectorAll(".popup-btn");
 const closePopup = document.querySelector(".popup-close");
 const doneBtn = document.getElementById("done-btn");
+const cardContainer = document.getElementById("credit-container");
 
 let selectedType = "";
+let allCards = [];
 
 addButton.addEventListener("click", () => {
     popup.classList.remove("hidden");
@@ -31,41 +33,46 @@ imageUpload.addEventListener("change", function () {
             const card = document.createElement("div");
             card.className = "card";
             card.style.backgroundImage = `url('${e.target.result}')`;
+            card.dataset.type = selectedType;
 
             card.addEventListener("click", () => {
                 expandCard(card);
             });
 
-            const container = selectedType === "credit"
-                ? document.getElementById("credit-container")
-                : document.getElementById("loyalty-container");
-
-            const cardIndex = container.children.length;
-            card.style.setProperty("--i", cardIndex);
-            container.appendChild(card);
-
+            allCards.push(card);
+            renderCardStack();
             selectedType = "";
         };
         reader.readAsDataURL(file);
     }
 });
 
+function renderCardStack() {
+    cardContainer.innerHTML = "";
+    const sorted = [
+        ...allCards.filter(c => c.dataset.type === "credit"),
+        ...allCards.filter(c => c.dataset.type === "loyalty")
+    ];
+    sorted.forEach((card, i) => {
+        card.style.setProperty('--i', i);
+        cardContainer.appendChild(card);
+    });
+}
+
 function expandCard(card) {
-    const allCards = document.querySelectorAll(".card");
     allCards.forEach(c => {
         if (c !== card) c.style.display = "none";
     });
-
     card.classList.add("expanded");
     doneBtn.style.display = "block";
 }
 
 doneBtn.addEventListener("click", () => {
-    const allCards = document.querySelectorAll(".card");
-    allCards.forEach((c, index) => {
-        c.classList.remove("expanded");
-        c.style.display = "block";
-        c.style.setProperty("--i", index);
+    allCards.forEach((card, i) => {
+        card.classList.remove("expanded");
+        card.style.display = "block";
+        card.style.setProperty('--i', i);
     });
+    renderCardStack();
     doneBtn.style.display = "none";
 });
