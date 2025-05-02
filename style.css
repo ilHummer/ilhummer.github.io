@@ -64,6 +64,8 @@ body {
     z-index: calc(100 - var(--i));
     cursor: pointer;
     border: none;
+    perspective: 1000px;
+    transform-style: preserve-3d;
 }
 
 .card.expanded {
@@ -138,4 +140,24 @@ body {
     margin-top: 10px;
     cursor: pointer;
     font-size: 14px;
+}
+
+.card.tilted {
+    transform: translateX(-50%) translateY(calc(var(--i) * 30px)) rotateX(var(--rotateX)) rotateY(var(--rotateY));
+}
+
+.nfc-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1001;
+    color: white;
+    font-size: 24px;
+    display: none;
 }
