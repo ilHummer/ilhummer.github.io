@@ -12,7 +12,7 @@ function createCard(imageSrc, isLoyalty = false) {
   const card = document.createElement("div");
   card.classList.add("card");
   card.style.zIndex = cardZIndex++;
-  card.style.top = `${cardZIndex * 12}px`;
+  card.style.top = `${cardZIndex * 20}px`;
 
   const img = document.createElement("img");
   img.src = imageSrc;
@@ -28,6 +28,7 @@ function createCard(imageSrc, isLoyalty = false) {
         c.classList.add("active");
       }
     });
+    document.querySelector('header').style.display = 'none';
     doneBtn.classList.add("visible");
   });
 }
@@ -71,5 +72,6 @@ doneBtn.addEventListener("click", () => {
     c.classList.remove("active");
     c.style.display = "block";
   });
+  document.querySelector('header').style.display = 'flex';
   doneBtn.classList.remove("visible");
 });
