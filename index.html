@@ -5,308 +5,90 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Apple Wallet Clone</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: #000;
-            color: white;
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        header {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            padding: 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 100;
-            background: #000;
-            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
-        }
-
-        .header-hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .title {
-            font-size: 42px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            transition: inherit;
-        }
-
-        .controls {
-            display: flex;
-            gap: 12px;
-            transition: inherit;
-        }
-
-        .control-btn {
-            width: 44px;
-            height: 44px;
-            background: rgba(255,255,255,0.9);
-            border-radius: 22px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: inherit;
-        }
-
-        .control-btn svg {
-            width: 24px;
-            height: 24px;
-            fill: #000;
-        }
-
-        .card-stack {
-            position: relative;
-            margin-top: 100px;
-            height: calc(100vh - 120px);
-            overflow-y: auto;
-            padding: 20px;
-        }
-
+        /* Add this new CSS */
         .card {
-            position: absolute;
-            width: 90%;
-            max-width: 400px;
-            left: 50%;
-            transform: translateX(-50%);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
-            opacity: 1;
-        }
-
-        .card img {
-            width: 100%;
-            height: auto;
-            display: block;
+            transition: all 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease;
+            will-change: transform, opacity;
         }
 
         .card.active {
             position: fixed;
-            top: 68px; /* 20px (done button) + 48px (2 inches) */
-            left: 50%;
-            transform: translateX(-50%);
+            top: 151px !important; /* 4cm ≈ 151px */
+            left: 50% !important;
+            transform: translate(-50%, 0) !important;
             z-index: 1000;
             max-width: 95%;
             width: 90%;
-            opacity: 1;
-        }
-
-        #done-btn {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 1001;
-            background: transparent;
-            color: white;
-            border: none;
-            padding: 0;
-            font-size: 20px;
-            font-weight: 600;
-            display: none;
-            cursor: pointer;
-        }
-
-        #done-btn.visible {
-            display: block;
-        }
-
-        .popup {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: #1c1c1e;
-            padding: 1.5rem;
-            border-radius: 24px 24px 0 0;
-            transform: translateY(100%);
-            transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
-            z-index: 1000;
-        }
-
-        .popup.visible {
-            transform: translateY(0);
-        }
-
-        .popup button {
-            width: 100%;
-            padding: 1rem;
-            background: #363638;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            margin-bottom: 8px;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-
-        .popup button:active {
-            transform: scale(0.98);
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1 class="title">Wallet</h1>
-        <div class="controls">
-            <div class="control-btn" id="addBtn">
-                <svg viewBox="0 0 24 24"><path d="M19 11h-6V5a1 1 0 0 0-2 0v6H5a1 1 0 0 0 0 2h6v6a1 1 0 0 0 2 0v-6h6a1 1 0 0 0 0-2z"/></svg>
-            </div>
-        </div>
-    </header>
-
-    <div class="card-stack">
-        <div id="creditSection"></div>
-        <div id="loyaltySection" style="margin-top: 300px"></div>
-    </div>
-
-    <button id="done-btn">Done</button>
-
-    <div class="popup">
-        <button id="addCreditBtn">Add Credit/Debit Card</button>
-        <button id="addLoyaltyBtn">Add Loyalty Card</button>
-        <button id="cancelBtn">Cancel</button>
-    </div>
+    <!-- Previous HTML remains the same -->
 
     <script>
-        const STORAGE_KEY = 'walletCards';
-        let creditCards = [];
-        let loyaltyCards = [];
-        const CARD_OFFSET = 60;
-
-        function loadSavedCards() {
-            const savedCards = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-            savedCards.forEach(card => {
-                createCard(card.image, card.isLoyalty, true);
-            });
-        }
-
-        function saveCards() {
-            const allCards = [
-                ...creditCards.map(card => ({ image: card.imageSrc, isLoyalty: false })),
-                ...loyaltyCards.map(card => ({ image: card.imageSrc, isLoyalty: true }))
-            ];
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(allCards));
-        }
-
-        function updateCardPositions() {
-            creditCards.forEach((card, index) => {
-                card.element.style.top = `${index * CARD_OFFSET}px`;
-                card.element.style.zIndex = index + 1;
-                card.element.style.opacity = 1;
-            });
-
-            loyaltyCards.forEach((card, index) => {
-                const basePosition = creditCards.length * CARD_OFFSET + 200;
-                card.element.style.top = `${basePosition + index * CARD_OFFSET}px`;
-                card.element.style.zIndex = creditCards.length + index + 1;
-                card.element.style.opacity = 1;
-            });
-        }
-
+        // Modified card click handler
         function createCard(imageSrc, isLoyalty, fromStorage = false) {
-            const section = isLoyalty ? document.getElementById('loyaltySection') 
-                                    : document.getElementById('creditSection');
-            const card = document.createElement('div');
-            card.className = `card ${isLoyalty ? 'loyalty-card' : ''}`;
-            
-            const img = document.createElement('img');
-            img.src = imageSrc;
-            
-            card.appendChild(img);
-            section.appendChild(card);
+            // ... existing code ...
 
-            const cardData = {
-                element: card,
-                imageSrc: imageSrc
-            };
+            card.addEventListener('click', function() {
+                const doneBtn = document.getElementById('done-btn');
+                
+                // Store original position
+                const originalRect = this.getBoundingClientRect();
+                this.style.position = 'fixed';
+                this.style.width = `${originalRect.width}px`;
+                this.style.height = `${originalRect.height}px`;
+                this.style.left = `${originalRect.left}px`;
+                this.style.top = `${originalRect.top}px`;
 
-            card.addEventListener('click', () => {
-                document.querySelectorAll('.card').forEach(c => {
-                    c.style.opacity = 0;
+                // Trigger reflow
+                void this.offsetWidth;
+
+                // Animate to final position
+                this.classList.add('active');
+                this.style.width = '90%';
+                this.style.left = '50%';
+                this.style.top = '151px'; // 4cm below done button
+                this.style.transform = 'translateX(-50%)';
+
+                // Hide other elements
+                document.querySelectorAll('.card:not(.active)').forEach(c => {
+                    c.style.opacity = '0';
                     c.style.pointerEvents = 'none';
                 });
-                card.style.opacity = 1;
-                card.style.pointerEvents = 'auto';
-                card.classList.add('active');
                 document.querySelector('header').classList.add('header-hidden');
-                document.getElementById('done-btn').classList.add('visible');
+                doneBtn.classList.add('visible');
             });
 
-            if (isLoyalty) {
-                loyaltyCards.push(cardData);
-            } else {
-                creditCards.push(cardData);
-            }
-
-            if (!fromStorage) saveCards();
-            updateCardPositions();
+            // ... rest of createCard function ...
         }
 
-        document.getElementById('done-btn').addEventListener('click', () => {
-            document.querySelectorAll('.card').forEach(card => {
-                card.style.opacity = 1;
-                card.style.pointerEvents = 'auto';
-                card.classList.remove('active');
-            });
-            document.querySelector('header').classList.remove('header-hidden');
-            document.getElementById('done-btn').classList.remove('visible');
-            updateCardPositions();
-        });
+        // Modified done button handler
+        document.getElementById('done-btn').addEventListener('click', function() {
+            const activeCard = document.querySelector('.card.active');
+            if (activeCard) {
+                // Store current position
+                const currentRect = activeCard.getBoundingClientRect();
+                
+                // Animate back to original position
+                activeCard.style.width = `${activeCard.originalWidth}px`;
+                activeCard.style.height = `${activeCard.originalHeight}px`;
+                activeCard.style.left = `${activeCard.originalLeft}px`;
+                activeCard.style.top = `${activeCard.originalTop}px`;
 
-        // Initialize
-        loadSavedCards();
+                setTimeout(() => {
+                    activeCard.classList.remove('active');
+                    activeCard.style.cssText = ''; // Reset inline styles
+                }, 400);
 
-        document.getElementById('addBtn').addEventListener('click', () => {
-            document.querySelector('.popup').classList.add('visible');
-        });
-
-        document.getElementById('cancelBtn').addEventListener('click', () => {
-            document.querySelector('.popup').classList.remove('visible');
-        });
-
-        document.getElementById('addCreditBtn').addEventListener('click', () => {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.onchange = e => {
-                const reader = new FileReader();
-                reader.onload = () => {
-                    createCard(reader.result, false);
-                };
-                reader.readAsDataURL(e.target.files[0]);
-            };
-            input.click();
-            document.querySelector('.popup').classList.remove('visible');
-        });
-
-        document.getElementById('addLoyaltyBtn').addEventListener('click', () => {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.onchange = e => {
-                const reader = new FileReader();
-                reader.onload = () => {
-                    createCard(reader.result, true);
-                };
-                reader.readAsDataURL(e.target.files[0]);
-            };
-            input.click();
-            document.querySelector('.popup').classList.remove('visible');
+                // Show other elements
+                document.querySelectorAll('.card').forEach(c => {
+                    c.style.opacity = '1';
+                    c.style.pointerEvents = 'auto';
+                });
+                document.querySelector('header').classList.remove('header-hidden');
+                this.classList.remove('visible');
+            }
         });
     </script>
 </body>
