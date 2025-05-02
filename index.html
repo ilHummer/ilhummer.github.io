@@ -76,7 +76,7 @@
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transition: all 0.3s ease;
         }
 
         .loyalty-card {
@@ -99,23 +99,22 @@
             height: 70vh;
         }
 
-        .close-btn {
+        #done-btn {
             position: fixed;
             top: 20px;
-            right: 20px;
+            left: 20px;
             z-index: 1001;
-            width: 40px;
-            height: 40px;
-            background: rgba(255,255,255,0.9);
+            background: transparent;
+            border: 1px solid white;
+            color: white;
+            padding: 8px 16px;
             border-radius: 20px;
             display: none;
-            align-items: center;
-            justify-content: center;
             cursor: pointer;
         }
 
-        .close-btn.visible {
-            display: flex;
+        #done-btn.visible {
+            display: block;
         }
 
         .popup {
@@ -154,11 +153,6 @@
             <div class="control-btn" id="addBtn">
                 <svg viewBox="0 0 24 24"><path d="M19 11h-6V5a1 1 0 0 0-2 0v6H5a1 1 0 0 0 0 2h6v6a1 1 0 0 0 2 0v-6h6a1 1 0 0 0 0-2z"/></svg>
             </div>
-            <div class="control-btn" id="menuBtn">
-                <svg viewBox="0 0 24 24">
-                    <circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/>
-                </svg>
-            </div>
         </div>
     </header>
 
@@ -167,7 +161,7 @@
         <div id="loyaltySection" style="margin-top: 300px"></div>
     </div>
 
-    <div class="close-btn" id="closeBtn">✕</div>
+    <button id="done-btn">Done</button>
 
     <div class="popup">
         <button id="addCreditBtn">Add Credit/Debit Card</button>
@@ -181,17 +175,17 @@
         const CARD_OFFSET = 60;
 
         function updateCardPositions() {
+            // Credit cards stacking (no scaling)
             creditCards.forEach((card, index) => {
                 card.style.top = `${index * CARD_OFFSET}px`;
                 card.style.zIndex = index + 1;
-                card.style.transform = `translateX(-50%) scale(${1 - index * 0.05})`;
             });
 
+            // Loyalty cards stacking
             loyaltyCards.forEach((card, index) => {
                 const basePosition = creditCards.length * CARD_OFFSET + 200;
                 card.style.top = `${basePosition + index * CARD_OFFSET}px`;
                 card.style.zIndex = creditCards.length + index + 1;
-                card.style.transform = `translateX(-50%) scale(${1 - index * 0.05})`;
             });
         }
 
@@ -207,10 +201,15 @@
             card.appendChild(img);
             section.appendChild(card);
 
-            // Add click handler
+            // Click handler
             card.addEventListener('click', () => {
+                // Hide all other cards
+                document.querySelectorAll('.card').forEach(c => {
+                    c.style.display = 'none';
+                });
+                card.style.display = 'block';
                 card.classList.add('active');
-                document.getElementById('closeBtn').classList.add('visible');
+                document.getElementById('done-btn').classList.add('visible');
             });
 
             if (isLoyalty) {
@@ -222,12 +221,13 @@
             updateCardPositions();
         }
 
-        // Close button handler
-        document.getElementById('closeBtn').addEventListener('click', () => {
+        // Done button handler
+        document.getElementById('done-btn').addEventListener('click', () => {
             document.querySelectorAll('.card').forEach(card => {
+                card.style.display = 'block';
                 card.classList.remove('active');
             });
-            document.getElementById('closeBtn').classList.remove('visible');
+            document.getElementById('done-btn').classList.remove('visible');
             updateCardPositions();
         });
 
