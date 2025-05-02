@@ -1,77 +1,81 @@
-const addBtn = document.getElementById("addBtn");
-const popup = document.getElementById("popup");
-const addCreditBtn = document.getElementById("addCreditBtn");
-const addLoyaltyBtn = document.getElementById("addLoyaltyBtn");
-const cancelBtn = document.getElementById("cancelBtn");
-const cardContainer = document.getElementById("cardContainer");
-const doneBtn = document.getElementById("done-btn");
-
+const cards = [];
 let cardZIndex = 1;
 
-function createCard(imageSrc, isLoyalty = false) {
-  const card = document.createElement("div");
-  card.classList.add("card");
+// Elements
+const addBtn = document.getElementById('addBtn');
+const popup = document.getElementById('popup');
+const cardContainer = document.getElementById('cardContainer');
+const doneBtn = document.getElementById('done-btn');
+
+// Create Card Element
+function createCard(imageSrc, isLoyalty) {
+  const card = document.createElement('div');
+  card.className = 'card';
   card.style.zIndex = cardZIndex++;
-  card.style.top = `${cardZIndex * 20}px`;
+  card.style.transform = `translateY(${cardZIndex * 12}px)`;
 
-  const img = document.createElement("img");
+  const img = document.createElement('img');
   img.src = imageSrc;
-
   card.appendChild(img);
-  cardContainer.appendChild(card);
 
-  card.addEventListener("click", () => {
-    document.querySelectorAll(".card").forEach(c => {
-      if (c !== card) {
-        c.style.display = "none";
-      } else {
-        c.classList.add("active");
-      }
-    });
+  // Add to appropriate position
+  if(isLoyalty) {
+    cards.push(card);
+  } else {
+    cards.unshift(card);
+  }
+  
+  cardContainer.append(...cards.map(c => {
+    c.style.transform = `translateY(${(cards.indexOf(c) + 1) * 12}px)`;
+    return c;
+  }));
+
+  // Click Handler
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.card').forEach(c => c.style.display = 'none');
+    card.style.display = 'block';
+    card.classList.add('active');
     document.querySelector('header').style.display = 'none';
-    doneBtn.classList.add("visible");
+    doneBtn.classList.add('visible');
   });
 }
 
-function openImagePicker(isLoyalty) {
-  const input = document.createElement("input");
-  input.type = "file";
-  input.accept = "image/*";
-  input.onchange = (e) => {
+// Image Upload Handler
+function handleImageUpload(isLoyalty) {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.onchange = e => {
     const file = e.target.files[0];
-    if (!file) return;
     const reader = new FileReader();
-    reader.onload = (event) => {
-      createCard(event.target.result, isLoyalty);
-    };
+    reader.onload = () => createCard(reader.result, isLoyalty);
     reader.readAsDataURL(file);
   };
   input.click();
 }
 
-addBtn.addEventListener("click", () => {
-  popup.classList.remove("hidden");
+// Event Listeners
+addBtn.addEventListener('click', () => popup.classList.add('visible'));
+
+document.getElementById('addCreditBtn').addEventListener('click', () => {
+  popup.classList.remove('visible');
+  handleImageUpload(false);
 });
 
-addCreditBtn.addEventListener("click", () => {
-  popup.classList.add("hidden");
-  openImagePicker(false);
+document.getElementById('addLoyaltyBtn').addEventListener('click', () => {
+  popup.classList.remove('visible');
+  handleImageUpload(true);
 });
 
-addLoyaltyBtn.addEventListener("click", () => {
-  popup.classList.add("hidden");
-  openImagePicker(true);
+document.getElementById('cancelBtn').addEventListener('click', () => {
+  popup.classList.remove('visible');
 });
 
-cancelBtn.addEventListener("click", () => {
-  popup.classList.add("hidden");
-});
-
-doneBtn.addEventListener("click", () => {
-  document.querySelectorAll(".card").forEach(c => {
-    c.classList.remove("active");
-    c.style.display = "block";
+doneBtn.addEventListener('click', () => {
+  document.querySelectorAll('.card').forEach(c => {
+    c.style.display = 'block';
+    c.classList.remove('active');
   });
   document.querySelector('header').style.display = 'flex';
-  doneBtn.classList.remove("visible");
+  doneBtn.classList.remove('visible');
 });
