@@ -3,12 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="stylesheet" href="style.css" />
-  <link rel="manifest" href="manifest.json" />
-  <link rel="apple-touch-icon" href="icon.png" />
   <title>Wallet</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
@@ -16,21 +12,22 @@
   <header>
     <h1 class="title">Wallet</h1>
     <div class="controls">
-      <div id="addBtn" class="control-btn">+</div>
-      <div class="control-btn">⋯</div>
+      <div class="control-btn" id="addBtn">+</div>
+      <div class="control-btn">...</div>
     </div>
   </header>
+
+  <!-- Card Container -->
+  <div id="cardContainer"></div>
 
   <!-- Done Button -->
   <button id="done-btn">Done</button>
 
-  <!-- Cards Container -->
-  <div id="cardContainer"></div>
-
-  <!-- Popup Selector -->
-  <div id="popup" class="hidden">
-    <button id="addCreditBtn">Add Credit Card</button>
+  <!-- Popup for Card Type -->
+  <div id="popup" class="popup hidden">
+    <button id="addCreditBtn">Add Credit/Debit Card</button>
     <button id="addLoyaltyBtn">Add Loyalty Card</button>
+    <button id="cancelBtn">Cancel</button>
   </div>
 
   <script src="script.js"></script>
