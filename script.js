@@ -8,25 +8,21 @@ const doneBtn = document.getElementById("done-btn");
 let cards = [];
 let loyaltyCards = [];
 
-// Hidden input for file upload
 const fileInput = document.createElement("input");
 fileInput.type = "file";
 fileInput.accept = "image/*";
 fileInput.style.display = "none";
 document.body.appendChild(fileInput);
 
-// Open popup when "+" is clicked
 addBtn.addEventListener("click", () => {
   popup.classList.remove("hidden");
 });
 
-// Add credit card
 addCreditBtn.addEventListener("click", () => {
   popup.classList.add("hidden");
   fileInput.onchange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
     const url = URL.createObjectURL(file);
     cards.push(url);
     renderCards();
@@ -34,13 +30,11 @@ addCreditBtn.addEventListener("click", () => {
   fileInput.click();
 });
 
-// Add loyalty card
 addLoyaltyBtn.addEventListener("click", () => {
   popup.classList.add("hidden");
   fileInput.onchange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
     const url = URL.createObjectURL(file);
     loyaltyCards.push(url);
     renderCards();
@@ -48,15 +42,8 @@ addLoyaltyBtn.addEventListener("click", () => {
   fileInput.click();
 });
 
-// Close popup
-function closePopup() {
-  popup.classList.add("hidden");
-}
-
-// Render cards
 function renderCards() {
   cardContainer.innerHTML = "";
-
   const all = [...cards, ...loyaltyCards];
 
   all.forEach((src, index) => {
@@ -66,16 +53,14 @@ function renderCards() {
     img.src = src;
     div.appendChild(img);
 
-    // Add stacking animation
-    div.style.marginTop = index === 0 ? "0px" : "-100px";
-    div.style.zIndex = all.length - index;
+    div.style.marginTop = index === 0 ? "0px" : "-80px";
+    div.style.zIndex = index + 1;
 
     div.addEventListener("click", () => expandCard(div));
     cardContainer.appendChild(div);
   });
 }
 
-// Expand selected card
 function expandCard(card) {
   document.querySelectorAll(".card").forEach((c) => {
     if (c !== card) c.style.display = "none";
@@ -85,7 +70,6 @@ function expandCard(card) {
   doneBtn.style.display = "block";
 }
 
-// Exit card view
 doneBtn.addEventListener("click", () => {
   document.querySelectorAll(".card").forEach((card) => {
     card.style.display = "block";
