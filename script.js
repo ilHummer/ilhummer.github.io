@@ -2,9 +2,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const STORAGE_KEY = 'walletCards';
     let cards = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
     
-    const cardStack = {
-        credit: document.querySelector('.credit-cards'),
-        loyalty: document.querySelector('.loyalty-cards')
+    const elements = {
+        creditCards: document.querySelector('.credit-cards'),
+        loyaltyCards: document.querySelector('.loyalty-cards'),
+        addBtn: document.getElementById('addBtn'),
+        deleteBtn: document.getElementById('deleteBtn'),
+        typeOverlay: document.getElementById('typeSelectionOverlay'),
+        confirmOverlay: document.getElementById('confirmationOverlay')
     };
 
     // Initialize app
@@ -16,12 +20,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderCards() {
-        cardStack.credit.innerHTML = '';
-        cardStack.loyalty.innerHTML = '';
+        elements.creditCards.innerHTML = '';
+        elements.loyaltyCards.innerHTML = '';
 
         cards.forEach(card => {
             const cardElement = createCardElement(card);
-            cardStack[card.type].appendChild(cardElement);
+            card.type === 'credit' 
+                ? elements.creditCards.appendChild(cardElement)
+                : elements.loyaltyCards.appendChild(cardElement);
         });
     }
 
@@ -40,38 +46,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function setupEventListeners() {
         // Add button click
-        document.getElementById('addBtn').addEventListener('click', () => {
-            document.getElementById('typeSelectionOverlay').style.display = 'block';
+        elements.addBtn.addEventListener('click', () => {
+            elements.typeOverlay.style.display = 'block';
         });
 
         // Type selection
         document.querySelectorAll('.type-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const type = btn.dataset.type;
-                document.getElementById('typeSelectionOverlay').style.display = 'none';
+            btn.addEventListener('click', (e) => {
+                const type = e.target.dataset.type;
+                elements.typeOverlay.style.display = 'none';
                 triggerImageUpload(type);
             });
         });
 
         // Cancel buttons
-        document.querySelectorAll('.cancel, .cancel-btn').forEach(btn => {
+        document.querySelectorAll('.cancel').forEach(btn => {
             btn.addEventListener('click', () => {
-                document.querySelectorAll('.modal-overlay').forEach(el => {
-                    el.style.display = 'none';
-                });
+                elements.typeOverlay.style.display = 'none';
+                elements.confirmOverlay.style.display = 'none';
             });
         });
 
         // Delete functionality
-        document.getElementById('deleteBtn').addEventListener('click', () => {
-            document.getElementById('confirmationOverlay').style.display = 'block';
+        elements.deleteBtn.addEventListener('click', () => {
+            elements.confirmOverlay.style.display = 'block';
         });
 
         document.querySelector('.delete').addEventListener('click', () => {
             cards = [];
             localStorage.removeItem(STORAGE_KEY);
             renderCards();
-            document.getElementById('confirmationOverlay').style.display = 'none';
+            elements.confirmOverlay.style.display = 'none';
         });
     }
 
