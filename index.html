@@ -2,59 +2,73 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Wallet Prank</title>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="apple-touch-icon" href="icon.png" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header>
+  <!-- Header -->
+  <header class="header">
     <h1 class="title">Wallet</h1>
     <div class="controls">
-      <div class="control-btn" id="deleteBtn" title="Delete All Cards">
+      <button id="deleteBtn" class="icon-btn" title="Delete All Cards">
         <!-- Vertical Ellipsis SVG -->
         <svg width="24" height="24" fill="white" viewBox="0 0 24 24">
           <circle cx="12" cy="5" r="2"/>
           <circle cx="12" cy="12" r="2"/>
           <circle cx="12" cy="19" r="2"/>
         </svg>
-      </div>
-      <div class="control-btn" id="addBtn" title="Add Card">
+      </button>
+      <button id="addBtn" class="icon-btn" title="Add Card">
         <!-- Plus Icon SVG -->
         <svg width="24" height="24" fill="white" viewBox="0 0 24 24">
           <path d="M19 11H13V5h-2v6H5v2h6v6h2v-6h6z"/>
         </svg>
-      </div>
+      </button>
     </div>
   </header>
 
-  <div id="cardContainer"></div>
-  <button id="done-btn">Done</button>
+  <!-- Card Container -->
+  <main id="cardContainer" class="card-container">
+    <!-- Cards will be dynamically added here -->
+  </main>
 
-  <div id="popup" class="popup">
-    <button id="addCreditBtn">Add Credit/Debit Card</button>
-    <button id="addLoyaltyBtn">Add Loyalty Card</button>
-    <button id="cancelBtn">Cancel</button>
+  <!-- Disclaimer Modal -->
+  <div id="disclaimerModal" class="modal">
+    <div class="modal-content">
+      <p>This website is for educational and testing purposes only. Do not use it for fraudulent activities.</p>
+      <button id="acknowledgeBtn">Understood</button>
+    </div>
   </div>
 
   <!-- Welcome Tutorial Modal -->
-  <div id="welcomeModal" class="modal hidden">
+  <div id="welcomeModal" class="modal">
     <div class="modal-content">
-      <div class="slides">
-        <!-- Slides will be injected here -->
+      <div id="tutorialSlide">
+        <img id="slideImage" src="" alt="Tutorial Slide" />
+        <p id="slideText"></p>
       </div>
       <button id="nextSlideBtn">Next</button>
     </div>
   </div>
 
-  <!-- Disclaimer Modal -->
-  <div id="disclaimerModal" class="modal hidden">
+  <!-- Card Detail Modal -->
+  <div id="cardDetailModal" class="modal">
     <div class="modal-content">
-      <p>This website is for educational and testing purposes only. Do not use it for fraudulent activities.</p>
-      <button id="acknowledgeBtn">Understood</button>
+      <img id="cardDetailImage" src="" alt="Card Detail" />
+      <p class="latest-transactions">Latest Transactions</p>
+      <p class="no-transactions">No transaction history</p>
+      <div class="modal-actions">
+        <button id="doneBtn">Done</button>
+        <button id="cardOptionsBtn" class="icon-btn">
+          <!-- Horizontal Ellipsis SVG -->
+          <svg width="24" height="24" fill="white" viewBox="0 0 24 24">
+            <circle cx="5" cy="12" r="2"/>
+            <circle cx="12" cy="12" r="2"/>
+            <circle cx="19" cy="12" r="2"/>
+          </svg>
+        </button>
+      </div>
     </div>
   </div>
 
