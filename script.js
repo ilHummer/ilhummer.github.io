@@ -33,9 +33,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const card = document.createElement('div');
         card.className = 'card';
         
-        const img = document.createElement('img');
+        const img = new Image(); // Use Image constructor for better handling
         img.src = cardData.image;
         img.alt = `${cardData.type} card`;
+        img.onload = () => {
+            card.style.height = `${img.naturalHeight}px`; // Set card height based on image
+        };
+        img.onerror = () => {
+            console.error('Failed to load image:', cardData.image);
+            card.remove();
+        };
         
         card.appendChild(img);
         
@@ -47,60 +54,32 @@ document.addEventListener('DOMContentLoaded', () => {
         return card;
     }
 
-    function setupEventListeners() {
-        // Add card flow
-        elements.addBtn.addEventListener('click', () => {
-            elements.typeModal.style.display = 'block';
-        });
-
-        // Type selection
-        document.querySelectorAll('.type-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const type = e.target.dataset.type;
-                elements.typeModal.style.display = 'none';
-                triggerImageUpload(type);
-            });
-        });
-
-        // Delete flow
-        elements.deleteBtn.addEventListener('click', () => {
-            elements.confirmModal.style.display = 'block';
-        });
-
-        // Cancel buttons
-        document.querySelectorAll('.cancel-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                elements.typeModal.style.display = 'none';
-                elements.confirmModal.style.display = 'none';
-            });
-        });
-
-        // Confirm delete
-        document.querySelector('.delete-btn').addEventListener('click', () => {
-            cards = [];
-            localStorage.removeItem(STORAGE_KEY);
-            renderCards();
-            elements.confirmModal.style.display = 'none';
-        });
-    }
-
-    function triggerImageUpload(type) {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'image/*';
-        input.onchange = e => handleImageUpload(e, type);
-        input.click();
-    }
+    // ... rest of the script.js remains the same ...
 
     function handleImageUpload(e, type) {
         const file = e.target.files[0];
         if (!file) return;
 
+        // Validate image file
+        if (!file.type.startsWith('image/')) {
+            alert('Please select an image file');
+            return;
+        }
+
         const reader = new FileReader();
         reader.onload = () => {
+            // Verify the data URL
+            if (!reader.result.startsWith('data:image')) {
+                console.error('Invalid image data:', reader.result);
+                return;
+            }
+
             cards.push({ type: type, image: reader.result });
             localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
             renderCards();
+        };
+        reader.onerror = (error) => {
+            console.error('File reading error:', error);
         };
         reader.readAsDataURL(file);
     }
