@@ -12,12 +12,12 @@
         <div class="header-controls">
             <button class="control-btn" id="addBtn">
                 <svg viewBox="0 0 24 24">
-                    <path fill="#000000" d="M19 11h-6V5h-2v6H5v2h6v6h2v-6h6z"/>
+                    <path fill="#000" d="M19 11h-6V5h-2v6H5v2h6v6h2v-6h6z"/>
                 </svg>
             </button>
             <button class="control-btn" id="deleteBtn">
                 <svg viewBox="0 0 24 24">
-                    <path fill="#000000" d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm-6 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm12 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>
+                    <path fill="#000" d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm-6 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm12 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>
                 </svg>
             </button>
         </div>
@@ -29,21 +29,21 @@
     </main>
 
     <!-- Modals -->
-    <div class="modal-overlay" id="typeSelectionOverlay">
-        <div class="type-selection-modal">
+    <div class="modal-overlay" id="typeModal">
+        <div class="type-selection">
             <button class="type-btn" data-type="credit">Credit/Debit Card</button>
             <button class="type-btn" data-type="loyalty">Loyalty Card</button>
-            <button class="btn cancel-btn">Cancel</button>
+            <button class="cancel-btn">Cancel</button>
         </div>
     </div>
 
-    <div class="modal-overlay" id="confirmationOverlay">
-        <div class="confirmation-modal">
+    <div class="modal-overlay" id="confirmModal">
+        <div class="confirmation-box">
             <h2>Delete All Cards?</h2>
-            <p>This action cannot be undone.</p>
+            <p>This cannot be undone</p>
             <div class="modal-actions">
-                <button class="btn cancel">Cancel</button>
-                <button class="btn delete">Delete All</button>
+                <button class="cancel-btn">Cancel</button>
+                <button class="delete-btn">Delete All</button>
             </div>
         </div>
     </div>
