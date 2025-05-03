@@ -3,313 +3,293 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mobile Wallet</title>
+  <title>Wallet Clone</title>
   <style>
-    /* Reset and base styles */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
     }
 
     body {
       background: #000;
-      color: #fff;
+      color: white;
       font-family: -apple-system, BlinkMacSystemFont, sans-serif;
       height: 100vh;
       overflow: hidden;
     }
 
-    /* Header styles */
     header {
       position: fixed;
       top: 0;
       width: 100%;
-      padding: 15px;
+      padding: 1rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(20px);
-      z-index: 1000;
+      z-index: 100;
+      background: #000;
+      transition: all 0.3s ease;
     }
 
-    .wallet-title {
-      font-size: 34px;
+    .title {
+      font-size: 32px;
       font-weight: 700;
     }
 
-    .header-controls {
+    .controls {
       display: flex;
-      gap: 8px;
+      gap: 12px;
     }
 
     .control-btn {
-      width: 32px;
-      height: 32px;
-      background: rgba(255, 255, 255, 0.9);
+      width: 44px;
+      height: 44px;
+      background: rgba(255,255,255,0.9);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: transform 0.1s ease;
-      border: none;
-    }
-
-    .control-btn:active {
-      transform: scale(0.9);
     }
 
     .control-btn svg {
-      width: 20px;
-      height: 20px;
+      width: 24px;
+      height: 24px;
       fill: #000;
     }
 
-    /* Main content styles */
-    .card-stack {
-      margin-top: 84px;
-      padding: 12px;
-      height: calc(100vh - 84px);
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
+    #done-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1001;
+      background: transparent;
+      color: white;
+      border: none;
+      font-size: 18px;
+      font-weight: bold;
+      display: none;
+      cursor: pointer;
     }
 
-    .card-container {
+    #done-btn.visible {
+      display: block;
+    }
+
+    .card-stack {
+      margin-top: 80px;
+      padding: 20px 0;
+      height: calc(100vh - 80px);
+      overflow-y: auto;
+      scroll-behavior: smooth;
+    }
+
+    .section {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      padding-bottom: 20px;
+      align-items: center;
+      gap: 0;
     }
 
     .card {
       position: relative;
-      width: 100%;
+      width: 90%;
       max-width: 400px;
-      margin: 0 auto;
       border-radius: 16px;
       overflow: hidden;
-      background: #1c1c1e;
-      min-height: 200px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      margin-bottom: -22%; /* overlap to bring them closer */
+      transition: transform 0.3s ease, opacity 0.3s ease;
       cursor: pointer;
     }
 
     .card img {
       width: 100%;
-      height: auto;
       display: block;
-      object-fit: cover;
     }
 
-    /* Overlay and modal styles */
-    .overlay {
+    .card.active {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.9);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 2000;
-    }
-
-    .modal {
-      background: #1c1c1e;
+      top: 90px;
+      left: 50%;
+      transform: translate(-50%, 0) scale(1.02);
+      z-index: 1000;
       width: 90%;
-      max-width: 400px;
-      border-radius: 18px;
-      padding: 24px;
-      animation: modalIn 0.3s ease-out;
+      max-width: 95%;
+      animation: rise 0.3s ease-out forwards;
     }
 
-    @keyframes modalIn {
+    @keyframes rise {
       from {
-        transform: translateY(50px);
-        opacity: 0;
+        transform: translate(-50%, 100%) scale(1);
       }
       to {
-        transform: translateY(0);
-        opacity: 1;
+        transform: translate(-50%, 0) scale(1.02);
       }
     }
 
-    .modal h2 {
-      font-size: 22px;
-      margin-bottom: 12px;
+    .popup {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #1c1c1e;
+      padding: 1.5rem;
+      border-radius: 24px 24px 0 0;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+      z-index: 1000;
     }
 
-    .modal-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-top: 24px;
+    .popup.visible {
+      transform: translateY(0);
     }
 
-    .btn {
-      padding: 16px;
-      border: none;
-      border-radius: 12px;
-      font-size: 17px;
-      font-weight: 500;
-      cursor: pointer;
+    .popup button {
       width: 100%;
-    }
-
-    .card-type-btn {
+      padding: 1rem;
       background: #363638;
       color: white;
+      border: none;
+      border-radius: 12px;
+      margin-bottom: 10px;
+      cursor: pointer;
     }
 
-    .delete-btn {
-      background: #ff3b30;
-      color: white;
+    .header-hidden {
+      opacity: 0;
+      pointer-events: none;
     }
 
-    .cancel-btn {
-      background: #2c2c2e;
-      color: white;
+    .loyalty-separator {
+      height: 150px;
     }
   </style>
 </head>
 <body>
   <header>
-    <h1 class="wallet-title">Wallet</h1>
-    <div class="header-controls">
-      <button class="control-btn" id="addBtn" title="Add Card">
-        <svg viewBox="0 0 24 24">
-          <path d="M19 11h-6V5h-2v6H5v2h6v6h2v-6h6z" />
-        </svg>
-      </button>
-      <button class="control-btn" id="deleteBtn" title="Delete All Cards">
-        <svg viewBox="0 0 24 24">
-          <path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm-6 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm12 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" />
-        </svg>
-      </button>
+    <h1 class="title">Wallet</h1>
+    <div class="controls">
+      <div class="control-btn" id="addBtn">
+        <svg viewBox="0 0 24 24"><path d="M19 11h-6V5a1 1 0 0 0-2 0v6H5a1 1 0 0 0 0 2h6v6a1 1 0 0 0 2 0v-6h6a1 1 0 0 0 0-2z"/></svg>
+      </div>
     </div>
   </header>
 
-  <main class="card-stack">
-    <div class="card-container" id="cardContainer"></div>
-  </main>
+  <button id="done-btn">Done</button>
 
-  <!-- Card Type Selection Modal -->
-  <div class="overlay" id="cardTypeModal">
-    <div class="modal">
-      <h2>Add Card</h2>
-      <div class="modal-actions">
-        <button class="btn card-type-btn" id="addCredit">Credit/Debit Card</button>
-        <button class="btn card-type-btn" id="addLoyalty">Loyalty Card</button>
-        <button class="btn cancel-btn" id="cancelAdd">Cancel</button>
-      </div>
-    </div>
+  <div class="card-stack">
+    <div class="section" id="creditSection"></div>
+    <div class="loyalty-separator"></div>
+    <div class="section" id="loyaltySection"></div>
   </div>
 
-  <!-- Delete Confirmation Modal -->
-  <div class="overlay" id="deleteModal">
-    <div class="modal">
-      <h2>Delete All Cards?</h2>
-      <p>This action cannot be undone.</p>
-      <div class="modal-actions">
-        <button class="btn cancel-btn" id="cancelDelete">Cancel</button>
-        <button class="btn delete-btn" id="confirmDelete">Delete All</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Image Preview Modal -->
-  <div class="overlay" id="imagePreviewModal">
-    <div class="modal">
-      <div class="card">
-        <img id="previewImage" src="" alt="Card Image" style="border-radius: 16px;" />
-      </div>
-      <div class="modal-actions" style="margin-top: 24px;">
-        <button class="btn cancel-btn" id="closePreview">Done</button>
-      </div>
-    </div>
+  <div class="popup">
+    <button id="addCreditBtn">Add Credit/Debit Card</button>
+    <button id="addLoyaltyBtn">Add Loyalty Card</button>
+    <button id="cancelBtn">Cancel</button>
   </div>
 
   <script>
     const STORAGE_KEY = 'walletCards';
-    let cards = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    let creditCards = [];
+    let loyaltyCards = [];
 
-    const elements = {
-      cardContainer: document.getElementById('cardContainer'),
-      addBtn: document.getElementById('addBtn'),
-      deleteBtn: document.getElementById('deleteBtn'),
-      cardTypeModal: document.getElementById('cardTypeModal'),
-      deleteModal: document.getElementById('deleteModal'),
-      addCredit: document.getElementById('addCredit'),
-      addLoyalty: document.getElementById('addLoyalty'),
-      cancelAdd: document.getElementById('cancelAdd'),
-      cancelDelete: document.getElementById('cancelDelete'),
-      confirmDelete: document.getElementById('confirmDelete'),
-      imagePreviewModal: document.getElementById('imagePreviewModal'),
-      previewImage: document.getElementById('previewImage'),
-      closePreview: document.getElementById('closePreview'),
-    };
-
-    document.addEventListener('DOMContentLoaded', init);
-
-    function init() {
-      checkFirstVisit();
-      renderCards();
-      setupEventListeners();
+    function saveCards() {
+      const data = [
+        ...creditCards.map(card => ({ image: card.image, isLoyalty: false })),
+        ...loyaltyCards.map(card => ({ image: card.image, isLoyalty: true }))
+      ];
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     }
 
-    function checkFirstVisit() {
-      if (!localStorage.getItem('disclaimerAccepted')) {
-        showLegalDisclaimer();
-      }
-    }
-
-    function showLegalDisclaimer() {
-      const disclaimerText =
-        'This app is for educational purposes only.\nDo not use for actual financial transactions.';
-      if (confirm(disclaimerText)) {
-        localStorage.setItem('disclaimerAccepted', 'true');
-      } else {
-        window.location.href = 'about:blank';
-      }
-    }
-
-    function renderCards() {
-      elements.cardContainer.innerHTML = '';
-      cards.forEach((card, index) => {
-        const cardElement = document.createElement('div');
-        cardElement.className = 'card';
-
-        const img = new Image();
-        img.src = card.image;
-        img.alt = `${card.type} card`;
-        img.style.width = '100%';
-
-        img.onload = () => {
-          cardElement.style.background = 'transparent';
-        };
-
-        img.onerror = () => {
-          alert('Failed to load image. Removing card.');
-          cardElement.remove();
-          cards.splice(index, 1);
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
-        };
-
-        cardElement.appendChild(img);
-        cardElement.addEventListener('click', () => showCardDetail(card));
-        elements.cardContainer.appendChild(cardElement);
+    function loadSavedCards() {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      saved.forEach(({ image, isLoyalty }) => {
+        createCard(image, isLoyalty);
       });
     }
 
-    function showCardDetail(card) {
-      elements.previewImage.src = card.image;
-      elements.imagePreviewModal.style.display = 'flex';
+    function createCard(imageSrc, isLoyalty) {
+      const card = document.createElement('div');
+      card.className = 'card';
+      const img = document.createElement('img');
+      img.src = imageSrc;
+      card.appendChild(img);
+
+      const section = isLoyalty ? document.getElementById('loyaltySection') : document.getElementById('creditSection');
+      section.appendChild(card);
+
+      const data = { element: card, image: imageSrc };
+      (isLoyalty ? loyaltyCards : creditCards).push(data);
+
+      card.addEventListener('click', () => {
+        card.classList.add('active');
+        document.getElementById('done-btn').classList.add('visible');
+        document.querySelectorAll('.card:not(.active)').forEach(c => {
+          c.style.opacity = '0';
+          c.style.pointerEvents = 'none';
+        });
+        document.querySelector('header').classList.add('header-hidden');
+      });
+
+      saveCards();
     }
 
-    function setupEventListeners() {
-      // Add Card Flow
-::contentReference[oaicite:0]{index=0}
- 
+    document.getElementById('done-btn').addEventListener('click', () => {
+      const active = document.querySelector('.card.active');
+      if (active) {
+        active.classList.remove('active');
+        active.style.opacity = '1';
+        document.querySelectorAll('.card').forEach(c => {
+          c.style.opacity = '1';
+          c.style.pointerEvents = 'auto';
+        });
+        document.querySelector('header').classList.remove('header-hidden');
+        document.getElementById('done-btn').classList.remove('visible');
+      }
+    });
+
+    document.getElementById('addBtn').addEventListener('click', () => {
+      document.querySelector('.popup').classList.add('visible');
+    });
+
+    document.getElementById('cancelBtn').addEventListener('click', () => {
+      document.querySelector('.popup').classList.remove('visible');
+    });
+
+    document.getElementById('addCreditBtn').addEventListener('click', () => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.onchange = e => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          createCard(reader.result, false);
+        };
+        reader.readAsDataURL(e.target.files[0]);
+      };
+      input.click();
+      document.querySelector('.popup').classList.remove('visible');
+    });
+
+    document.getElementById('addLoyaltyBtn').addEventListener('click', () => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.onchange = e => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          createCard(reader.result, true);
+        };
+        reader.readAsDataURL(e.target.files[0]);
+      };
+      input.click();
+      document.querySelector('.popup').classList.remove('visible');
+    });
+
+    loadSavedCards();
+  </script>
+</body>
+</html>
