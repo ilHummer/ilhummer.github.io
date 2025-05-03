@@ -1,182 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mobile Wallet</title>
-  <style>
-    /* (Styles remain the same as in your provided code) */
-    /* You can paste your existing <style> block here */
-  </style>
+    <meta charset="UTF-8">
+    <title>Flashcard App</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            margin-top: 30px;
+            color: #333;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 600px;
+            margin-top: 20px;
+        }
+
+        .input-box {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        input, textarea {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .add-btn {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .clear-btn {
+            background-color: #dc3545;
+            color: white;
+            margin-top: 10px;
+        }
+
+        .flashcard {
+            background-color: white;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .flashcard h3 {
+            margin: 0 0 5px;
+            color: #007bff;
+        }
+
+        .flashcard p {
+            margin: 0;
+        }
+
+        .flashcards-list {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <h1 class="wallet-title">Wallet</h1>
-    <div class="header-controls">
-      <button class="control-btn" id="addBtn" title="Add Card">
-        <svg viewBox="0 0 24 24">
-          <path d="M19 11h-6V5h-2v6H5v2h6v6h2v-6h6z" />
-        </svg>
-      </button>
-      <button class="control-btn" id="deleteBtn" title="Delete All Cards">
-        <svg viewBox="0 0 24 24">
-          <path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm-6 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm12 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" />
-        </svg>
-      </button>
+
+<h1>Flashcard App</h1>
+
+<div class="container">
+    <div class="input-box">
+        <input type="text" id="question" placeholder="Enter question">
+        <textarea id="answer" rows="3" placeholder="Enter answer"></textarea>
+        <button class="add-btn" onclick="addFlashcard()">Add Flashcard</button>
+        <button class="clear-btn" onclick="deleteAllFlashcards()">Delete All</button>
     </div>
-  </header>
 
-  <main class="card-stack">
-    <div class="card-container" id="cardContainer"></div>
-  </main>
+    <div class="flashcards-list" id="flashcards"></div>
+</div>
 
-  <!-- Add Card Modal -->
-  <div class="overlay" id="cardTypeModal">
-    <div class="modal">
-      <h2>Add Card</h2>
-      <div class="modal-actions">
-        <button class="btn card-type-btn" id="addCredit">Credit/Debit Card</button>
-        <button class="btn card-type-btn" id="addLoyalty">Loyalty Card</button>
-        <button class="btn cancel-btn" id="cancelAdd">Cancel</button>
-      </div>
-    </div>
-  </div>
+<script>
+    const flashcardsContainer = document.getElementById('flashcards');
 
-  <!-- Delete All Modal -->
-  <div class="overlay" id="deleteModal">
-    <div class="modal">
-      <h2>Delete All Cards?</h2>
-      <p>This action cannot be undone.</p>
-      <div class="modal-actions">
-        <button class="btn cancel-btn" id="cancelDelete">Cancel</button>
-        <button class="btn delete-btn" id="confirmDelete">Delete All</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Image Preview Modal -->
-  <div class="overlay" id="imagePreviewModal">
-    <div class="modal">
-      <div class="card">
-        <img id="previewImage" src="" alt="Card Image" style="border-radius: 16px;" />
-      </div>
-      <div class="modal-actions" style="margin-top: 24px;">
-        <button class="btn cancel-btn" id="closePreview">Done</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const STORAGE_KEY = 'walletCards';
-    let cards = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-
-    const elements = {
-      cardContainer: document.getElementById('cardContainer'),
-      addBtn: document.getElementById('addBtn'),
-      deleteBtn: document.getElementById('deleteBtn'),
-      cardTypeModal: document.getElementById('cardTypeModal'),
-      deleteModal: document.getElementById('deleteModal'),
-      addCredit: document.getElementById('addCredit'),
-      addLoyalty: document.getElementById('addLoyalty'),
-      cancelAdd: document.getElementById('cancelAdd'),
-      cancelDelete: document.getElementById('cancelDelete'),
-      confirmDelete: document.getElementById('confirmDelete'),
-      imagePreviewModal: document.getElementById('imagePreviewModal'),
-      previewImage: document.getElementById('previewImage'),
-      closePreview: document.getElementById('closePreview'),
-    };
-
-    document.addEventListener('DOMContentLoaded', init);
-
-    function init() {
-      checkFirstVisit();
-      renderCards();
-      setupEventListeners();
+    function getFlashcards() {
+        return JSON.parse(localStorage.getItem('flashcards') || '[]');
     }
 
-    function checkFirstVisit() {
-      if (!localStorage.getItem('disclaimerAccepted')) {
-        const disclaimer = confirm('This app is for educational purposes only.\nDo not use for actual financial transactions.');
-        if (disclaimer) {
-          localStorage.setItem('disclaimerAccepted', 'true');
+    function saveFlashcards(cards) {
+        localStorage.setItem('flashcards', JSON.stringify(cards));
+    }
+
+    function renderFlashcards() {
+        flashcardsContainer.innerHTML = '';
+        const cards = getFlashcards();
+
+        cards.forEach((card, index) => {
+            const div = document.createElement('div');
+            div.className = 'flashcard';
+            div.innerHTML = `<h3>Q: ${card.question}</h3><p>A: ${card.answer}</p>`;
+            flashcardsContainer.appendChild(div);
+        });
+    }
+
+    function addFlashcard() {
+        const question = document.getElementById('question').value.trim();
+        const answer = document.getElementById('answer').value.trim();
+
+        if (question && answer) {
+            const cards = getFlashcards();
+            cards.push({ question, answer });
+            saveFlashcards(cards);
+            renderFlashcards();
+            document.getElementById('question').value = '';
+            document.getElementById('answer').value = '';
         } else {
-          window.location.href = 'about:blank';
+            alert('Please enter both a question and an answer.');
         }
-      }
     }
 
-    function renderCards() {
-      elements.cardContainer.innerHTML = '';
-      cards.forEach((card, index) => {
-        const cardElement = document.createElement('div');
-        cardElement.className = 'card';
-
-        const img = new Image();
-        img.src = card.image;
-        img.alt = `${card.type} card`;
-        img.style.width = '100%';
-
-        img.onload = () => {
-          cardElement.style.background = 'transparent';
-        };
-
-        img.onerror = () => {
-          alert('Failed to load image. Removing card.');
-          cardElement.remove();
-          cards.splice(index, 1);
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
-        };
-
-        cardElement.appendChild(img);
-        cardElement.addEventListener('click', () => showCardDetail(card));
-        elements.cardContainer.appendChild(cardElement);
-      });
+    function deleteAllFlashcards() {
+        if (confirm('Are you sure you want to delete all flashcards?')) {
+            localStorage.removeItem('flashcards');
+            renderFlashcards();
+        }
     }
 
-    function showCardDetail(card) {
-      elements.previewImage.src = card.image;
-      elements.imagePreviewModal.style.display = 'flex';
-    }
+    window.onload = renderFlashcards;
+</script>
 
-    function setupEventListeners() {
-      // Delete all
-      elements.deleteBtn.addEventListener('click', () => {
-        elements.deleteModal.style.display = 'flex';
-      });
-
-      elements.cancelDelete.addEventListener('click', () => {
-        elements.deleteModal.style.display = 'none';
-      });
-
-      elements.confirmDelete.addEventListener('click', () => {
-        cards = [];
-        localStorage.removeItem(STORAGE_KEY);
-        renderCards();
-        elements.deleteModal.style.display = 'none';
-      });
-
-      // Add button logic
-      elements.addBtn.addEventListener('click', () => {
-        elements.cardTypeModal.style.display = 'flex';
-      });
-
-      elements.cancelAdd.addEventListener('click', () => {
-        elements.cardTypeModal.style.display = 'none';
-      });
-
-      // Placeholder for addCard handlers
-      elements.addCredit.addEventListener('click', () => {
-        alert("Credit/Debit card addition not implemented.");
-      });
-
-      elements.addLoyalty.addEventListener('click', () => {
-        alert("Loyalty card addition not implemented.");
-      });
-
-      elements.closePreview.addEventListener('click', () => {
-        elements.imagePreviewModal.style.display = 'none';
-      });
-    }
-  </script>
 </body>
 </html>
