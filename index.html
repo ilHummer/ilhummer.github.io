@@ -12,27 +12,31 @@
         <div class="header-controls">
             <button class="control-btn" id="addBtn">
                 <svg viewBox="0 0 24 24">
-                    <path fill="currentColor" d="M19 11h-6V5h-2v6H5v2h6v6h2v-6h6z"/>
+                    <path fill="#000000" d="M19 11h-6V5h-2v6H5v2h6v6h2v-6h6z"/>
                 </svg>
             </button>
             <button class="control-btn" id="deleteBtn">
                 <svg viewBox="0 0 24 24">
-                    <path fill="currentColor" d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm-6 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm12 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>
+                    <path fill="#000000" d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm-6 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm12 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>
                 </svg>
             </button>
         </div>
     </header>
 
     <main class="card-stack">
-        <div class="credit-section">
-            <div class="section-title">Payment Cards</div>
-        </div>
-        <div class="loyalty-section">
-            <div class="section-title">Loyalty Cards</div>
-        </div>
+        <div class="credit-cards"></div>
+        <div class="loyalty-cards"></div>
     </main>
 
     <!-- Modals -->
+    <div class="modal-overlay" id="typeSelectionOverlay">
+        <div class="type-selection-modal">
+            <button class="type-btn" data-type="credit">Credit/Debit Card</button>
+            <button class="type-btn" data-type="loyalty">Loyalty Card</button>
+            <button class="btn cancel-btn">Cancel</button>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="confirmationOverlay">
         <div class="confirmation-modal">
             <h2>Delete All Cards?</h2>
@@ -42,24 +46,6 @@
                 <button class="btn delete">Delete All</button>
             </div>
         </div>
-    </div>
-
-    <div class="modal-overlay" id="tutorialOverlay">
-        <div class="tutorial-slide">
-            <h2>Welcome to Wallet Prank</h2>
-            <p>This is for educational purposes only</p>
-            <button class="btn understood">Understood</button>
-        </div>
-    </div>
-
-    <div class="card-type-modal">
-        <button class="card-type-btn" data-type="credit">
-            <span>Credit/Debit Card</span>
-        </button>
-        <button class="card-type-btn" data-type="loyalty">
-            <span>Loyalty Card</span>
-        </button>
-        <button class="btn cancel-type">Cancel</button>
     </div>
 
     <script src="script.js"></script>
