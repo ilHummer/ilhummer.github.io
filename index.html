@@ -2,10 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mobile Wallet</title>
     <style>
-        /* Reset */
         * {
             margin: 0;
             padding: 0;
@@ -21,7 +20,6 @@
             overflow: hidden;
         }
 
-        /* Header */
         header {
             position: fixed;
             top: 0;
@@ -42,12 +40,12 @@
 
         .header-controls {
             display: flex;
-            gap: 12px;
+            gap: 8px;
         }
 
         .control-btn {
-            width: 44px;
-            height: 44px;
+            width: 32px;
+            height: 32px;
             background: rgba(255,255,255,0.9);
             border-radius: 50%;
             display: flex;
@@ -62,12 +60,11 @@
         }
 
         .control-btn svg {
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             fill: #000;
         }
 
-        /* Card Stack */
         .card-stack {
             margin-top: 84px;
             padding: 12px;
@@ -101,7 +98,6 @@
             pointer-events: none;
         }
 
-        /* Overlay */
         .overlay {
             position: fixed;
             top: 0;
@@ -115,7 +111,6 @@
             z-index: 2000;
         }
 
-        /* Modals */
         .modal {
             background: #1c1c1e;
             width: 90%;
@@ -137,18 +132,24 @@
 
         .modal-actions {
             display: flex;
+            flex-direction: column;
             gap: 12px;
             margin-top: 24px;
         }
 
         .btn {
-            flex: 1;
             padding: 16px;
             border: none;
             border-radius: 12px;
             font-size: 17px;
             font-weight: 500;
             cursor: pointer;
+            width: 100%;
+        }
+
+        .card-type-btn {
+            background: #363638;
+            color: white;
         }
 
         .delete-btn {
@@ -157,8 +158,12 @@
         }
 
         .cancel-btn {
-            background: #363638;
+            background: #2c2c2e;
             color: white;
+        }
+
+        #cardTypeModal {
+            display: none;
         }
     </style>
 </head>
@@ -179,6 +184,18 @@
         <div class="card-container" id="cardContainer"></div>
     </main>
 
+    <!-- Card Type Selection Modal -->
+    <div class="overlay" id="cardTypeModal">
+        <div class="modal">
+            <h2>Add Card</h2>
+            <div class="modal-actions">
+                <button class="btn card-type-btn" id="addCredit">Credit/Debit Card</button>
+                <button class="btn card-type-btn" id="addLoyalty">Loyalty Card</button>
+                <button class="btn cancel-btn" id="cancelAdd">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Delete Confirmation Modal -->
     <div class="overlay" id="deleteModal">
         <div class="modal">
@@ -195,17 +212,19 @@
         const STORAGE_KEY = 'walletCards';
         let cards = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
         
-        // DOM Elements
         const elements = {
             cardContainer: document.getElementById('cardContainer'),
             addBtn: document.getElementById('addBtn'),
             deleteBtn: document.getElementById('deleteBtn'),
+            cardTypeModal: document.getElementById('cardTypeModal'),
             deleteModal: document.getElementById('deleteModal'),
+            addCredit: document.getElementById('addCredit'),
+            addLoyalty: document.getElementById('addLoyalty'),
+            cancelAdd: document.getElementById('cancelAdd'),
             cancelDelete: document.getElementById('cancelDelete'),
             confirmDelete: document.getElementById('confirmDelete')
         };
 
-        // Initialize
         document.addEventListener('DOMContentLoaded', init);
 
         function init() {
@@ -262,26 +281,26 @@
         }
 
         function setupEventListeners() {
-            // Add Card
+            // Add Card Flow
             elements.addBtn.addEventListener('click', () => {
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = 'image/*';
-                input.onchange = handleImageUpload;
-                input.click();
+                elements.cardTypeModal.style.display = 'flex';
             });
 
-            // Delete Cards
+            elements.addCredit.addEventListener('click', () => handleAddCard('credit'));
+            elements.addLoyalty.addEventListener('click', () => handleAddCard('loyalty'));
+            elements.cancelAdd.addEventListener('click', () => {
+                elements.cardTypeModal.style.display = 'none';
+            });
+
+            // Delete Flow
             elements.deleteBtn.addEventListener('click', () => {
                 elements.deleteModal.style.display = 'flex';
             });
 
-            // Cancel Delete
             elements.cancelDelete.addEventListener('click', () => {
                 elements.deleteModal.style.display = 'none';
             });
 
-            // Confirm Delete
             elements.confirmDelete.addEventListener('click', () => {
                 cards = [];
                 localStorage.removeItem(STORAGE_KEY);
@@ -289,22 +308,33 @@
                 elements.deleteModal.style.display = 'none';
             });
 
-            // Close modal on overlay click
-            elements.deleteModal.addEventListener('click', (e) => {
-                if (e.target === elements.deleteModal) {
-                    elements.deleteModal.style.display = 'none';
-                }
+            // Close modals on overlay click
+            document.querySelectorAll('.overlay').forEach(overlay => {
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) {
+                        overlay.style.display = 'none';
+                    }
+                });
             });
         }
 
-        function handleImageUpload(e) {
+        function handleAddCard(type) {
+            elements.cardTypeModal.style.display = 'none';
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = e => handleImageUpload(e, type);
+            input.click();
+        }
+
+        function handleImageUpload(e, type) {
             const file = e.target.files[0];
             if (!file) return;
 
             const reader = new FileReader();
             reader.onload = () => {
                 cards.push({
-                    type: confirm('Is this a loyalty card?') ? 'loyalty' : 'credit',
+                    type: type,
                     image: reader.result
                 });
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
