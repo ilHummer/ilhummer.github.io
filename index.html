@@ -1,77 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Wallet Prank</title>
-  <link rel="stylesheet" href="styles.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet Prank</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Header -->
-  <header class="header">
-    <h1 class="title">Wallet</h1>
-    <div class="controls">
-      <button id="deleteBtn" class="icon-btn" title="Delete All Cards">
-        <!-- Vertical Ellipsis SVG -->
-        <svg width="24" height="24" fill="white" viewBox="0 0 24 24">
-          <circle cx="12" cy="5" r="2"/>
-          <circle cx="12" cy="12" r="2"/>
-          <circle cx="12" cy="19" r="2"/>
-        </svg>
-      </button>
-      <button id="addBtn" class="icon-btn" title="Add Card">
-        <!-- Plus Icon SVG -->
-        <svg width="24" height="24" fill="white" viewBox="0 0 24 24">
-          <path d="M19 11H13V5h-2v6H5v2h6v6h2v-6h6z"/>
-        </svg>
-      </button>
+    <header>
+        <h1 class="wallet-title">Wallet</h1>
+        <div class="header-controls">
+            <button class="control-btn" id="addBtn">+</button>
+            <button class="control-btn" id="deleteBtn">•••</button>
+        </div>
+    </header>
+
+    <main class="card-stack"></main>
+
+    <!-- Modals and Overlays -->
+    <div class="modal-overlay" id="confirmationOverlay">
+        <div class="confirmation-modal">
+            <h2>Delete All Cards?</h2>
+            <p>This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button class="btn cancel">Cancel</button>
+                <button class="btn delete">Delete All</button>
+            </div>
+        </div>
     </div>
-  </header>
 
-  <!-- Card Container -->
-  <main id="cardContainer" class="card-container">
-    <!-- Cards will be dynamically added here -->
-  </main>
-
-  <!-- Disclaimer Modal -->
-  <div id="disclaimerModal" class="modal">
-    <div class="modal-content">
-      <p>This website is for educational and testing purposes only. Do not use it for fraudulent activities.</p>
-      <button id="acknowledgeBtn">Understood</button>
+    <div class="modal-overlay" id="tutorialOverlay">
+        <div class="tutorial-slide">
+            <h2>Welcome to Wallet Prank</h2>
+            <p>This is for educational purposes only</p>
+            <button class="btn understood">Understood</button>
+        </div>
     </div>
-  </div>
 
-  <!-- Welcome Tutorial Modal -->
-  <div id="welcomeModal" class="modal">
-    <div class="modal-content">
-      <div id="tutorialSlide">
-        <img id="slideImage" src="" alt="Tutorial Slide" />
-        <p id="slideText"></p>
-      </div>
-      <button id="nextSlideBtn">Next</button>
-    </div>
-  </div>
-
-  <!-- Card Detail Modal -->
-  <div id="cardDetailModal" class="modal">
-    <div class="modal-content">
-      <img id="cardDetailImage" src="" alt="Card Detail" />
-      <p class="latest-transactions">Latest Transactions</p>
-      <p class="no-transactions">No transaction history</p>
-      <div class="modal-actions">
-        <button id="doneBtn">Done</button>
-        <button id="cardOptionsBtn" class="icon-btn">
-          <!-- Horizontal Ellipsis SVG -->
-          <svg width="24" height="24" fill="white" viewBox="0 0 24 24">
-            <circle cx="5" cy="12" r="2"/>
-            <circle cx="12" cy="12" r="2"/>
-            <circle cx="19" cy="12" r="2"/>
-          </svg>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
