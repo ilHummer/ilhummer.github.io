@@ -67,20 +67,21 @@ header {
 
 .card {
     position: relative;
-    width: 100%;
+    width: 90%;
     max-width: 400px;
-    margin: 0 auto;
+    margin: 0 auto 15px;
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    background: #000;
+    min-height: 150px; /* Minimum height for visibility */
 }
 
 .card img {
     width: 100%;
-    height: auto;
-    display: block;
+    height: 100%;
     object-fit: contain;
-    border-radius: 12px;
+    display: block;
 }
 
 .modal-overlay {
