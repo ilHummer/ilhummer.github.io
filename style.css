@@ -8,8 +8,8 @@
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
     Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  background-color: #f0f0f0;
-  color: #000;
+  background-color: #121212;
+  color: #ffffff;
 }
 
 /* Header */
@@ -18,7 +18,7 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  background-color: #fff;
+  background-color: #1f1f1f;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -38,7 +38,7 @@ body {
 .icon-btn {
   width: 36px;
   height: 36px;
-  background: #000;
+  background: #333333;
   border: none;
   border-radius: 18px;
   display: flex;
@@ -50,7 +50,7 @@ body {
 .icon-btn svg {
   width: 20px;
   height: 20px;
-  fill: #fff;
+  fill: #ffffff;
 }
 
 /* Card Container */
