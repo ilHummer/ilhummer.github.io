@@ -87,15 +87,15 @@
             margin: 0 auto;
             border-radius: 16px;
             overflow: hidden;
-            transform-origin: center;
-            transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+            background: #1c1c1e;
+            min-height: 200px;
         }
 
         .card img {
             width: 100%;
             height: auto;
             display: block;
-            pointer-events: none;
+            object-fit: cover;
         }
 
         .overlay {
@@ -160,10 +160,6 @@
         .cancel-btn {
             background: #2c2c2e;
             color: white;
-        }
-
-        #cardTypeModal {
-            display: none;
         }
     </style>
 </head>
@@ -253,10 +249,25 @@
             cards.forEach((card, index) => {
                 const cardElement = document.createElement('div');
                 cardElement.className = 'card';
-                cardElement.innerHTML = `
-                    <img src="${card.image}" alt="${card.type} card">
-                `;
                 
+                const img = new Image();
+                img.src = card.image;
+                img.alt = `${card.type} card`;
+                img.style.width = '100%';
+                
+                img.onload = () => {
+                    cardElement.style.background = 'transparent';
+                };
+                
+                img.onerror = () => {
+                    console.error('Failed to load image:', card.image);
+                    cardElement.remove();
+                    // Remove invalid card from storage
+                    cards = cards.filter((_, i) => i !== index);
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
+                };
+
+                cardElement.appendChild(img);
                 cardElement.addEventListener('click', () => showCardDetail(card, index));
                 elements.cardContainer.appendChild(cardElement);
             });
@@ -268,7 +279,7 @@
             overlay.innerHTML = `
                 <div class="modal">
                     <div class="card">
-                        <img src="${card.image}" alt="${card.type} card">
+                        <img src="${card.image}" alt="${card.type} card" style="border-radius: 16px;">
                     </div>
                     <div class="modal-actions" style="margin-top: 24px;">
                         <button class="btn cancel-btn" onclick="this.closest('.overlay').remove()">Done</button>
@@ -331,16 +342,32 @@
             const file = e.target.files[0];
             if (!file) return;
 
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                alert('Please select a valid image file (JPEG, PNG, GIF)');
+                return;
+            }
+
             const reader = new FileReader();
             reader.onload = () => {
-                cards.push({
-                    type: type,
-                    image: reader.result
-                });
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
-                renderCards();
+                // Verify the image data
+                const testImg = new Image();
+                testImg.onload = () => {
+                    cards.push({
+                        type: type,
+                        image: reader.result
+                    });
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
+                    renderCards();
+                };
+                testImg.onerror = () => {
+                    alert('Error loading image. Please try another file.');
+                };
+                testImg.src = reader.result;
             };
-            reader.onerror = () => alert('Error loading image');
+            reader.onerror = () => {
+                alert('Error reading file. Please try again.');
+            };
             reader.readAsDataURL(file);
         }
     </script>
