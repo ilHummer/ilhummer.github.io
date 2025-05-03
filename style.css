@@ -1,98 +1,245 @@
-/* Header Adjustments */
+/* Reset and Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #000;
+  color: white;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Header */
 header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 1rem;
   height: 80px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #000;
+  z-index: 100;
 }
 
 .title {
-  font-size: 34px; /* Standard iOS header size */
+  font-size: 34px;
   font-weight: 700;
+  letter-spacing: -0.5px;
 }
 
 .controls {
+  display: flex;
   gap: 8px;
 }
 
 .control-btn {
-  width: 44px; /* Standard iOS button size */
-  height: 44px;
+  width: 36px;
+  height: 36px;
+  background: #ffffff;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
 }
 
-/* Icon Images */
-#addBtn img,
-.control-btn:last-child img {
-  width: 24px;
-  height: 24px;
-  display: block;
+.control-btn svg {
+  width: 20px;
+  height: 20px;
 }
 
-/* Card Stacking */
+/* Card Container */
 #cardContainer {
-  width: 100%;
-  padding: 0 12px;
-  height: calc(100vh - 100px);
+  position: absolute;
+  top: 80px;
+  bottom: 0;
+  left: 0;
+  right: 0;
   overflow-y: auto;
+  padding: 0 12px;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
 }
 
+/* Cards */
 .card {
   width: 100%;
-  max-width: 375px; /* iPhone screen width */
+  max-width: 375px;
   margin: 0 auto;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
-  transform-origin: center top;
+  margin-top: -10%;
+  cursor: pointer;
 }
 
-/* Credit Card Dimensions */
+.card:first-child {
+  margin-top: 0;
+}
+
 .card[data-type="credit"] {
-  height: 0;
-  padding-bottom: 60%; /* 1084x684 aspect ratio */
+  aspect-ratio: 1084 / 684;
 }
 
-/* Loyalty Card Dimensions */
 .card[data-type="loyalty"] {
-  height: 0;
-  padding-bottom: 140%; /* 1066x1491 aspect ratio */
+  aspect-ratio: 1066 / 1491;
 }
 
 .card img {
-  position: absolute;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 12px;
+  display: block;
 }
 
-/* Stacking Effect */
-.card:not(:first-child) {
-  position: absolute;
-  top: 30px; /* Half card overlap */
-  transform: translateY(-50%) scale(0.98);
-  z-index: -1;
-}
-
+/* Active Card */
 .card.active {
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1000;
+  transform: translate(-50%, -50%) scale(1);
+  z-index: 999;
   max-height: 80vh;
   width: 94%;
+  margin-top: 0;
 }
 
-/* Loyalty Card Collapsed State */
-.card[data-type="loyalty"]:not(.active) {
-  max-height: 200px; /* Show only top 20% */
-  overflow: hidden;
+/* Done Button */
+#done-btn {
+  position: fixed;
+  top: 24px;
+  left: 24px;
+  color: white;
+  font-size: 16px;
+  background: transparent;
+  border: 1px solid white;
+  border-radius: 12px;
+  padding: 6px 12px;
+  z-index: 1000;
+  display: none;
+  cursor: pointer;
 }
 
-/* Scrolling Behavior */
-#cardContainer::-webkit-scrollbar {
+#done-btn.visible {
+  display: block;
+}
+
+/* Popup */
+.popup {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #1c1c1e;
+  padding: 1.5rem 1rem;
+  border-radius: 24px 24px 0 0;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+  z-index: 1000;
+}
+
+.popup.visible {
+  transform: translateY(0);
+}
+
+.popup button {
+  width: 100%;
+  padding: 1rem;
+  background: #363638;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal.hidden {
   display: none;
 }
 
-#cardContainer {
-  -webkit-overflow-scrolling: touch;
-  scroll-behavior: smooth;
+.modal-content {
+  background: #1c1c1e;
+  padding: 2rem;
+  border-radius: 12px;
+  text-align: center;
+  max-width: 90%;
+}
+
+.modal-content p {
+  margin-bottom: 1rem;
+}
+
+.modal-content button {
+  padding: 0.5rem 1rem;
+  background: #363638;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* Additional Buttons on Active Card */
+.card.active .card-actions {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+}
+
+.card-actions button {
+  background: transparent;
+  border: 1px solid white;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.card-actions svg {
+  width: 20px;
+  height: 20px;
+  fill: white;
+}
+
+/* Transaction Info */
+.transaction-info {
+  margin-top: 12px;
+  text-align: center;
+}
+
+.transaction-info h2 {
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.transaction-info p {
+  font-size: 14px;
+  color: #aaa;
 }
