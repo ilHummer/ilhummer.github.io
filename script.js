@@ -2,35 +2,41 @@ document.addEventListener('DOMContentLoaded', () => {
     const STORAGE_KEY = 'walletCards';
     let cards = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
     
-    // UI Elements
     const cardStack = document.querySelector('.card-stack');
     const addBtn = document.getElementById('addBtn');
     const deleteBtn = document.getElementById('deleteBtn');
-    
-    // Initialize app
+    const cardTypeModal = document.querySelector('.card-type-modal');
+
     initApp();
-    
+
     function initApp() {
         checkFirstVisit();
         renderCards();
         setupEventListeners();
     }
-    
+
     function checkFirstVisit() {
         if (!localStorage.getItem('welcomeShown')) {
-            showTutorial();
+            document.getElementById('tutorialOverlay').style.display = 'block';
         }
     }
-    
+
     function renderCards() {
-        cardStack.innerHTML = '';
-        cards.forEach((card, index) => {
-            const cardElement = createCardElement(card, index);
-            cardStack.appendChild(cardElement);
+        const creditSection = document.querySelector('.credit-section');
+        const loyaltySection = document.querySelector('.loyalty-section');
+        
+        creditSection.innerHTML = '<div class="section-title">Payment Cards</div>';
+        loyaltySection.innerHTML = '<div class="section-title">Loyalty Cards</div>';
+
+        cards.forEach((card) => {
+            const cardElement = createCardElement(card);
+            card.type === 'loyalty' 
+                ? loyaltySection.appendChild(cardElement)
+                : creditSection.appendChild(cardElement);
         });
     }
-    
-    function createCardElement(cardData, index) {
+
+    function createCardElement(cardData) {
         const card = document.createElement('div');
         card.className = 'card';
         card.dataset.type = cardData.type;
@@ -52,43 +58,47 @@ document.addEventListener('DOMContentLoaded', () => {
         card.addEventListener('click', handleCardClick);
         return card;
     }
-    
+
     function handleCardClick(e) {
         const card = e.currentTarget;
-        const isActive = card.classList.contains('active');
-        
-        if (!isActive) {
+        if (!card.classList.contains('active')) {
             activateCard(card);
         } else if (e.target.closest('.done-btn')) {
             deactivateCard(card);
         }
     }
-    
+
     function activateCard(card) {
         document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
         card.classList.add('active');
         document.querySelector('header').style.opacity = '0';
     }
-    
+
     function deactivateCard(card) {
         card.classList.remove('active');
         document.querySelector('header').style.opacity = '1';
     }
-    
+
     function setupEventListeners() {
         addBtn.addEventListener('click', showAddCardMenu);
-        deleteBtn.addEventListener('click', showDeleteConfirmation);
-        
+        deleteBtn.addEventListener('click', () => {
+            document.getElementById('confirmationOverlay').style.display = 'block';
+        });
+
+        document.querySelector('.cancel').addEventListener('click', hideAllModals);
+        document.querySelector('.delete').addEventListener('click', deleteAllCards);
+        document.querySelector('.understood').addEventListener('click', () => {
+            localStorage.setItem('welcomeShown', 'true');
+            hideAllModals();
+        });
+
         document.querySelectorAll('.modal-overlay').forEach(overlay => {
-            overlay.addEventListener('click', e => {
+            overlay.addEventListener('click', (e) => {
                 if (e.target === overlay) hideAllModals();
             });
         });
-        
-        document.querySelector('.cancel').addEventListener('click', hideAllModals);
-        document.querySelector('.delete').addEventListener('click', deleteAllCards);
     }
-    
+
     function showAddCardMenu() {
         const input = document.createElement('input');
         input.type = 'file';
@@ -96,66 +106,65 @@ document.addEventListener('DOMContentLoaded', () => {
         input.onchange = handleImageUpload;
         input.click();
     }
-    
+
     function handleImageUpload(e) {
         const file = e.target.files[0];
         if (!file) return;
-        
+
         const reader = new FileReader();
         reader.onload = () => {
-            const newCard = {
-                type: confirm('Is this a loyalty card?') ? 'loyalty' : 'credit',
-                image: reader.result,
-                transactions: []
-            };
+            cardTypeModal.classList.add('visible');
             
-            cards.push(newCard);
-            saveCards();
-            renderCards();
+            document.querySelectorAll('.card-type-btn').forEach(btn => {
+                btn.onclick = () => {
+                    const type = btn.dataset.type;
+                    addNewCard(reader.result, type);
+                    cardTypeModal.classList.remove('visible');
+                };
+            });
         };
         reader.readAsDataURL(file);
     }
-    
-    function showDeleteConfirmation() {
-        document.getElementById('confirmationOverlay').style.display = 'block';
+
+    function addNewCard(imageSrc, type) {
+        cards.push({
+            type: type,
+            image: imageSrc,
+            transactions: []
+        });
+        saveCards();
+        renderCards();
     }
-    
+
     function deleteAllCards() {
         cards = [];
         localStorage.removeItem(STORAGE_KEY);
         hideAllModals();
         renderCards();
     }
-    
+
     function hideAllModals() {
-        document.querySelectorAll('.modal-overlay').forEach(el => {
+        document.querySelectorAll('.modal-overlay, .card-type-modal').forEach(el => {
             el.style.display = 'none';
+            el.classList.remove('visible');
         });
     }
-    
+
     function saveCards() {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
-    }
-    
-    function showTutorial() {
-        document.getElementById('tutorialOverlay').style.display = 'block';
-        document.querySelector('.understood').addEventListener('click', () => {
-            localStorage.setItem('welcomeShown', 'true');
-            hideAllModals();
-        });
     }
 });
 
 // PWA Installation
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
-    const installButton = document.createElement('button');
-    installButton.textContent = 'Install App';
-    installButton.className = 'install-btn';
-    document.body.appendChild(installButton);
-    
-    installButton.addEventListener('click', () => {
+    const installBtn = document.createElement('button');
+    installBtn.className = 'btn install-btn';
+    installBtn.textContent = 'Install App';
+    document.body.appendChild(installBtn);
+
+    installBtn.addEventListener('click', () => {
         e.prompt();
-        installButton.remove();
+        installBtn.remove();
     });
 });
