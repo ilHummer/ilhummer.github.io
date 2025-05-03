@@ -1,22 +1,32 @@
 document.addEventListener('DOMContentLoaded', () => {
     const STORAGE_KEY = 'walletCards';
     let cards = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-    
+
+    // UI Elements
     const elements = {
         credit: document.querySelector('.credit-cards'),
         loyalty: document.querySelector('.loyalty-cards'),
         addBtn: document.getElementById('addBtn'),
         deleteBtn: document.getElementById('deleteBtn'),
-        typeModal: document.getElementById('typeModal'),
-        confirmModal: document.getElementById('confirmModal')
+        confirmationModal: document.getElementById('confirmationModal'),
+        cardOverlay: document.getElementById('cardOverlay')
     };
 
-    // Initialize app
-    init();
+    // Initialize
+    checkFirstVisit();
+    renderCards();
+    setupEventListeners();
 
-    function init() {
-        renderCards();
-        setupEventListeners();
+    function checkFirstVisit() {
+        if (!localStorage.getItem('tutorialShown')) {
+            showLegalDisclaimer();
+            localStorage.setItem('tutorialShown', 'true');
+        }
+    }
+
+    function showLegalDisclaimer() {
+        const disclaimer = confirm("This app is for educational purposes only. Do not use for actual financial transactions.");
+        if (!disclaimer) window.close();
     }
 
     function renderCards() {
@@ -25,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         cards.forEach(card => {
             const cardElement = createCardElement(card);
-            elements[card.type].appendChild(cardElement);
+            elements[card.type === 'credit' ? 'credit' : 'loyalty'].appendChild(cardElement);
         });
     }
 
@@ -33,53 +43,87 @@ document.addEventListener('DOMContentLoaded', () => {
         const card = document.createElement('div');
         card.className = 'card';
         
-        const img = new Image(); // Use Image constructor for better handling
+        const img = new Image();
         img.src = cardData.image;
         img.alt = `${cardData.type} card`;
-        img.onload = () => {
-            card.style.height = `${img.naturalHeight}px`; // Set card height based on image
-        };
-        img.onerror = () => {
-            console.error('Failed to load image:', cardData.image);
-            card.remove();
-        };
         
         card.appendChild(img);
         
-        card.addEventListener('click', () => {
-            card.classList.toggle('active');
-            document.querySelector('header').style.opacity = card.classList.contains('active') ? 0 : 1;
+        card.addEventListener('click', (e) => {
+            if (!card.classList.contains('active')) {
+                showCardDetail(cardData);
+            }
         });
 
         return card;
     }
 
-    // ... rest of the script.js remains the same ...
+    function showCardDetail(cardData) {
+        const overlayContent = document.createElement('div');
+        overlayContent.className = 'card-detail';
+        overlayContent.innerHTML = `
+            <div class="card">
+                <img src="${cardData.image}" alt="${cardData.type} card">
+                <div class="card-actions">
+                    ${cardData.type === 'loyalty' ? '<button class="action-btn">Share</button>' : ''}
+                    <button class="action-btn">${cardData.type === 'credit' ? 'Transactions' : 'Details'}</button>
+                </div>
+                <button class="done-btn">Done</button>
+            </div>
+        `;
 
-    function handleImageUpload(e, type) {
+        elements.cardOverlay.innerHTML = '';
+        elements.cardOverlay.appendChild(overlayContent);
+        elements.cardOverlay.classList.add('active');
+
+        // Close handlers
+        elements.cardOverlay.addEventListener('click', (e) => {
+            if (e.target === elements.cardOverlay || e.target.classList.contains('done-btn')) {
+                elements.cardOverlay.classList.remove('active');
+            }
+        });
+    }
+
+    function setupEventListeners() {
+        // Add Card
+        elements.addBtn.addEventListener('click', () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = e => handleImageUpload(e);
+            input.click();
+        });
+
+        // Delete Cards
+        elements.deleteBtn.addEventListener('click', () => {
+            elements.confirmationModal.style.display = 'flex';
+        });
+
+        // Confirm Delete
+        document.querySelector('.delete').addEventListener('click', () => {
+            cards = [];
+            localStorage.removeItem(STORAGE_KEY);
+            renderCards();
+            elements.confirmationModal.style.display = 'none';
+        });
+
+        // Cancel Delete
+        document.querySelector('.cancel').addEventListener('click', () => {
+            elements.confirmationModal.style.display = 'none';
+        });
+    }
+
+    function handleImageUpload(e) {
         const file = e.target.files[0];
         if (!file) return;
 
-        // Validate image file
-        if (!file.type.startsWith('image/')) {
-            alert('Please select an image file');
-            return;
-        }
-
+        const type = confirm('Is this a loyalty card?') ? 'loyalty' : 'credit';
         const reader = new FileReader();
+        
         reader.onload = () => {
-            // Verify the data URL
-            if (!reader.result.startsWith('data:image')) {
-                console.error('Invalid image data:', reader.result);
-                return;
-            }
-
-            cards.push({ type: type, image: reader.result });
+            cards.push({ type, image: reader.result });
             localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
             renderCards();
-        };
-        reader.onerror = (error) => {
-            console.error('File reading error:', error);
         };
         reader.readAsDataURL(file);
     }
