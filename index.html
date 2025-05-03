@@ -10,14 +10,29 @@
     <header>
         <h1 class="wallet-title">Wallet</h1>
         <div class="header-controls">
-            <button class="control-btn" id="addBtn">+</button>
-            <button class="control-btn" id="deleteBtn">•••</button>
+            <button class="control-btn" id="addBtn">
+                <svg viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M19 11h-6V5h-2v6H5v2h6v6h2v-6h6z"/>
+                </svg>
+            </button>
+            <button class="control-btn" id="deleteBtn">
+                <svg viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm-6 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm12 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>
+                </svg>
+            </button>
         </div>
     </header>
 
-    <main class="card-stack"></main>
+    <main class="card-stack">
+        <div class="credit-section">
+            <div class="section-title">Payment Cards</div>
+        </div>
+        <div class="loyalty-section">
+            <div class="section-title">Loyalty Cards</div>
+        </div>
+    </main>
 
-    <!-- Modals and Overlays -->
+    <!-- Modals -->
     <div class="modal-overlay" id="confirmationOverlay">
         <div class="confirmation-modal">
             <h2>Delete All Cards?</h2>
@@ -35,6 +50,16 @@
             <p>This is for educational purposes only</p>
             <button class="btn understood">Understood</button>
         </div>
+    </div>
+
+    <div class="card-type-modal">
+        <button class="card-type-btn" data-type="credit">
+            <span>Credit/Debit Card</span>
+        </button>
+        <button class="card-type-btn" data-type="loyalty">
+            <span>Loyalty Card</span>
+        </button>
+        <button class="btn cancel-type">Cancel</button>
     </div>
 
     <script src="script.js"></script>
