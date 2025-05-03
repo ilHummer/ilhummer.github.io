@@ -1,58 +1,38 @@
-let cardStack = [];
-const CARD_OFFSET = 30; // Pixel overlap between cards
+document.addEventListener('DOMContentLoaded', () => {
+  const cardContainer = document.getElementById('cardContainer');
+  const addBtn = document.getElementById('addBtn');
+  const deleteBtn = document.getElementById('deleteBtn');
+  const popup = document.getElementById('popup');
+  const addCreditBtn = document.getElementById('addCreditBtn');
+  const addLoyaltyBtn = document.getElementById('addLoyaltyBtn');
+  const cancelBtn = document.getElementById('cancelBtn');
+  const doneBtn = document.getElementById('done-btn');
+  const welcomeModal = document.getElementById('welcomeModal');
+  const disclaimerModal = document.getElementById('disclaimerModal');
+  const nextSlideBtn = document.getElementById('nextSlideBtn');
+  const acknowledgeBtn = document.getElementById('acknowledgeBtn');
 
-function createCard(imageSrc, isLoyalty) {
-  const card = document.createElement('div');
-  card.className = 'card';
-  card.dataset.type = isLoyalty ? 'loyalty' : 'credit';
-  
-  const img = new Image();
-  img.src = imageSrc;
-  img.onload = () => {
-    card.style.transform = `translateY(${cardStack.length * CARD_OFFSET}px)`;
-    card.style.zIndex = cardStack.length + 1;
-  };
-  
-  card.appendChild(img);
-  cardStack.push(card);
-  cardContainer.appendChild(card);
+  let cards = [];
+  let currentSlide = 0;
+  const slides = [
+    { text: "Welcome to Wallet Prank!", img: "slide1.png" },
+    { text: "Add your own cards easily.", img: "slide2.png" },
+    { text: "Tap on a card to view details.", img: "slide3.png" },
+    { text: "Delete all cards with the menu.", img: "slide4.png" },
+    { text: "Your cards are saved locally.", img: "slide5.png" },
+    { text: "Enjoy the experience!", img: "slide6.png" }
+  ];
 
-  // Click Handler
-  card.addEventListener('click', () => {
-    cardStack.forEach(c => {
-      c.style.transform = c === card ? 
-        'translateY(0) scale(1)' : 
-        `translateY(-${CARD_OFFSET}px) scale(0.9)`;
-      c.style.zIndex = c === card ? 1000 : 1;
-    });
-    
-    card.scrollIntoView({
-      behavior: 'smooth',
-      block: 'center'
-    });
-    
-    document.querySelector('header').style.display = 'none';
-    doneBtn.classList.add('visible');
-  });
-}
+  // Initialize
+  function init() {
+    loadCards();
+    if (!localStorage.getItem('welcomeShown')) {
+      showWelcomeModal();
+    }
+  }
 
-// Update image upload handler
-function handleImageUpload(isLoyalty) {
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = 'image/*';
-  input.onchange = e => {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-    reader.onload = () => {
-      createCard(reader.result, isLoyalty);
-      // Auto-scroll to new card
-      cardContainer.scrollTo({
-        top: cardContainer.scrollHeight,
-        behavior: 'smooth'
-      });
-    };
-    reader.readAsDataURL(file);
-  };
-  input.click();
-}
+  // Load Cards from localStorage
+  function loadCards() {
+    const savedCards = JSON.parse(localStorage
+::contentReference[oaicite:11]{index=11}
+ 
