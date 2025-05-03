@@ -3,12 +3,12 @@ document.addEventListener('DOMContentLoaded', () => {
     let cards = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
     
     const elements = {
-        creditCards: document.querySelector('.credit-cards'),
-        loyaltyCards: document.querySelector('.loyalty-cards'),
+        credit: document.querySelector('.credit-cards'),
+        loyalty: document.querySelector('.loyalty-cards'),
         addBtn: document.getElementById('addBtn'),
         deleteBtn: document.getElementById('deleteBtn'),
-        typeOverlay: document.getElementById('typeSelectionOverlay'),
-        confirmOverlay: document.getElementById('confirmationOverlay')
+        typeModal: document.getElementById('typeModal'),
+        confirmModal: document.getElementById('confirmModal')
     };
 
     // Initialize app
@@ -20,21 +20,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderCards() {
-        elements.creditCards.innerHTML = '';
-        elements.loyaltyCards.innerHTML = '';
+        elements.credit.innerHTML = '';
+        elements.loyalty.innerHTML = '';
 
         cards.forEach(card => {
             const cardElement = createCardElement(card);
-            card.type === 'credit' 
-                ? elements.creditCards.appendChild(cardElement)
-                : elements.loyaltyCards.appendChild(cardElement);
+            elements[card.type].appendChild(cardElement);
         });
     }
 
     function createCardElement(cardData) {
         const card = document.createElement('div');
         card.className = 'card';
-        card.innerHTML = `<img src="${cardData.image}" alt="Card">`;
+        
+        const img = document.createElement('img');
+        img.src = cardData.image;
+        img.alt = `${cardData.type} card`;
+        
+        card.appendChild(img);
         
         card.addEventListener('click', () => {
             card.classList.toggle('active');
@@ -45,38 +48,39 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function setupEventListeners() {
-        // Add button click
+        // Add card flow
         elements.addBtn.addEventListener('click', () => {
-            elements.typeOverlay.style.display = 'block';
+            elements.typeModal.style.display = 'block';
         });
 
         // Type selection
         document.querySelectorAll('.type-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const type = e.target.dataset.type;
-                elements.typeOverlay.style.display = 'none';
+                elements.typeModal.style.display = 'none';
                 triggerImageUpload(type);
             });
         });
 
+        // Delete flow
+        elements.deleteBtn.addEventListener('click', () => {
+            elements.confirmModal.style.display = 'block';
+        });
+
         // Cancel buttons
-        document.querySelectorAll('.cancel').forEach(btn => {
+        document.querySelectorAll('.cancel-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                elements.typeOverlay.style.display = 'none';
-                elements.confirmOverlay.style.display = 'none';
+                elements.typeModal.style.display = 'none';
+                elements.confirmModal.style.display = 'none';
             });
         });
 
-        // Delete functionality
-        elements.deleteBtn.addEventListener('click', () => {
-            elements.confirmOverlay.style.display = 'block';
-        });
-
-        document.querySelector('.delete').addEventListener('click', () => {
+        // Confirm delete
+        document.querySelector('.delete-btn').addEventListener('click', () => {
             cards = [];
             localStorage.removeItem(STORAGE_KEY);
             renderCards();
-            elements.confirmOverlay.style.display = 'none';
+            elements.confirmModal.style.display = 'none';
         });
     }
 
