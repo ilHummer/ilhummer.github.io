@@ -1,98 +1,131 @@
-/* Header Adjustments */
-header {
-  padding: 1rem;
-  height: 80px;
+/* Base Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    font-family: 'Inter', sans-serif;
 }
 
-.title {
-  font-size: 34px; /* Standard iOS header size */
-  font-weight: 700;
+/* Frame Setup */
+body {
+    background: #000;
+    width: 402px;
+    height: 874px;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
 }
 
-.controls {
-  gap: 8px;
+/* Header Styles */
+.header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    padding: 15px 27px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(20px);
+    z-index: 1000;
 }
 
-.control-btn {
-  width: 44px; /* Standard iOS button size */
-  height: 44px;
+.wallet-title {
+    color: white;
+    font-size: 32px;
+    font-weight: 800;
 }
 
-/* Icon Images */
-#addBtn img,
-.control-btn:last-child img {
-  width: 24px;
-  height: 24px;
-  display: block;
+/* Control Buttons */
+.header-controls {
+    display: flex;
+    gap: 12px;
 }
 
-/* Card Stacking */
-#cardContainer {
-  width: 100%;
-  padding: 0 12px;
-  height: calc(100vh - 100px);
-  overflow-y: auto;
+.menu-btn, .add-btn {
+    width: 32px;
+    height: 32px;
+    background: rgba(255,255,255,0.9);
+    border: none;
+    border-radius: 50%;
+    color: #000;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.card {
-  width: 100%;
-  max-width: 375px; /* iPhone screen width */
-  margin: 0 auto;
-  position: relative;
-  transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
-  transform-origin: center top;
+/* Modal System */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    display: none;
+    z-index: 2000;
 }
 
-/* Credit Card Dimensions */
-.card[data-type="credit"] {
-  height: 0;
-  padding-bottom: 60%; /* 1084x684 aspect ratio */
+.modal {
+    position: absolute;
+    background: #1C1C1E;
+    border-radius: 14px;
+    padding: 24px;
 }
 
-/* Loyalty Card Dimensions */
-.card[data-type="loyalty"] {
-  height: 0;
-  padding-bottom: 140%; /* 1066x1491 aspect ratio */
+/* Menu Modal */
+.menu-modal {
+    width: 230px;
+    top: 134px;
+    left: 145px;
+    background: rgba(177, 177, 177, 0.14);
+    backdrop-filter: blur(33.85px);
 }
 
-.card img {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 12px;
+.menu-item {
+    padding: 12px 0;
+    color: white;
+    font-size: 16px;
+    border-bottom: 0.2px solid rgba(178, 178, 178, 0.47);
 }
 
-/* Stacking Effect */
-.card:not(:first-child) {
-  position: absolute;
-  top: 30px; /* Half card overlap */
-  transform: translateY(-50%) scale(0.98);
-  z-index: -1;
+.menu-item.delete {
+    color: #FF2F1C;
 }
 
-.card.active {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1000;
-  max-height: 80vh;
-  width: 94%;
+/* Add Card Modal */
+.add-card-modal {
+    top: 86px;
+    width: 100%;
+    max-width: 348px;
+    background: #1C1C1E;
+    border-radius: 14px;
 }
 
-/* Loyalty Card Collapsed State */
-.card[data-type="loyalty"]:not(.active) {
-  max-height: 200px; /* Show only top 20% */
-  overflow: hidden;
+.card-option {
+    background: #2C2C2E;
+    padding: 16px;
+    margin: 12px 0;
+    border-radius: 8px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 16px;
 }
 
-/* Scrolling Behavior */
-#cardContainer::-webkit-scrollbar {
-  display: none;
+.option-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
 }
 
-#cardContainer {
-  -webkit-overflow-scrolling: touch;
-  scroll-behavior: smooth;
+.credit-card .option-icon {
+    background: #3998CB;
+}
+
+.other-card .option-icon {
+    background: #4FBE3C;
 }
