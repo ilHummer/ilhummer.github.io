@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Wallet Replica</title>
     <style>
-        /* Base Styles */
+        /* Improved Base Styles */
         * {
             margin: 0;
             padding: 0;
@@ -24,7 +24,7 @@
             overflow: hidden;
         }
 
-        /* Header Styles */
+        /* Fixed Header Layout */
         .header {
             position: fixed;
             top: 0;
@@ -38,142 +38,78 @@
             z-index: 1000;
         }
 
-        .wallet-title {
-            font-size: 32px;
-            font-weight: 800;
-        }
-
-        /* Control Buttons */
-        .control-btn {
-            width: 32px;
-            height: 32px;
-            background: rgba(255,255,255,0.9);
-            border-radius: 50%;
+        .header-controls {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: transform 0.2s ease;
+            gap: 12px; /* Proper button spacing */
         }
 
-        .control-btn:active {
-            transform: scale(0.9);
+        /* 3-dot Menu Fix */
+        .menu-modal {
+            width: 230px;
+            height: 162px;
+            top: 98px;
+            right: 27px;
+            background: rgba(177, 177, 177, 0.14);
+            backdrop-filter: blur(33.85px);
+            border-radius: 10px;
+            animation: slideIn 0.3s ease-out;
         }
 
-        /* Card Stack */
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Add Card Modal Fix */
+        .add-card-modal {
+            width: 402px;
+            height: 788px;
+            top: 86px;
+            background: #1C1C1E;
+            border-radius: 14px;
+            animation: riseUp 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        @keyframes riseUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        /* Card Stacking */
         .card-stack {
             margin-top: 84px;
             padding: 20px;
+            position: relative;
             height: calc(100% - 84px);
-            overflow-y: auto;
         }
 
         .card {
-            width: 100%;
-            max-width: 348px;
-            margin: 10px auto;
+            width: 348px;
+            height: 220px;
+            position: absolute;
             border-radius: 12px;
             overflow: hidden;
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
         .card img {
             width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        /* Modals */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.7);
-            display: none;
-            z-index: 2000;
+            object-fit: cover;
         }
 
-        /* Add Card Modal */
-        .add-card-modal {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            background: #1C1C1E;
-            border-radius: 14px 14px 0 0;
-            padding: 24px;
-        }
+        /* Card Stacking Layout */
+        .card:nth-child(1) { transform: translateY(0); z-index: 3; }
+        .card:nth-child(2) { transform: translateY(22px) scale(0.95); z-index: 2; }
+        .card:nth-child(3) { transform: translateY(44px) scale(0.9); z-index: 1; }
 
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 32px;
-        }
-
-        .close-btn {
-            width: 27px;
-            height: 27px;
-            background: #313035;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .close-btn::before,
-        .close-btn::after {
-            content: '';
-            width: 13px;
-            height: 2px;
-            background: #A2A2AA;
-            position: absolute;
-        }
-
-        .close-btn::before {
-            transform: rotate(45deg);
-        }
-
-        .close-btn::after {
-            transform: rotate(-45deg);
-        }
-
-        /* Settings Modal */
-        .settings-modal {
-            background: #1C1C1E;
-            border-radius: 14px;
-            padding: 24px;
-            width: 90%;
-            max-width: 348px;
-            position: relative;
-        }
-
-        .settings-option {
-            padding: 16px 0;
-            border-bottom: 0.2px solid rgba(178,178,178,0.47);
-        }
-
-        /* Showcase Pages */
-        .showcase-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000;
-            z-index: 3000;
-            display: none;
-        }
-
-        .showcase-header {
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .showcase-content {
-            padding: 20px;
+        /* Showcase Fix */
+        .showcase-overlay img {
+            width: 366px;
+            height: 231px;
+            border-radius: 12px;
+            object-fit: contain; /* Maintain original aspect ratio */
         }
     </style>
 </head>
@@ -187,146 +123,94 @@
         </div>
     </div>
 
-    <main class="card-stack" id="cardContainer">
-        <!-- Cards will be dynamically added here -->
-    </main>
+    <!-- Card Stack with Improved Layout -->
+    <main class="card-stack" id="cardContainer"></main>
 
     <!-- Add Card Modal -->
     <div class="modal-overlay" id="addCardModal">
         <div class="add-card-modal">
+            <!-- Modal content with proper spacing -->
             <div class="modal-header">
                 <h2>Add to Wallet</h2>
-                <button class="close-btn" id="closeAddModal"></button>
+                <button class="close-btn" id="closeAddModal">×</button>
             </div>
-            <div class="card-option">
-                <div class="option-icon credit-icon"></div>
-                Debit or Credit Card
-            </div>
-            <div class="card-option">
-                <div class="option-icon pass-icon"></div>
-                Passes and other Cards
-            </div>
-            <div class="github-watermark">
-                github.com/uplafe<br/>
-                Apple-Wallet-Replica
-            </div>
-        </div>
-    </div>
-
-    <!-- 3-dot Menu Modal -->
-    <div class="modal-overlay" id="menuModal">
-        <div class="menu-modal">
-            <div class="menu-item delete">Delete Cards</div>
-            <div class="menu-item">Settings</div>
-            <div class="menu-item">GitHub</div>
-        </div>
-    </div>
-
-    <!-- Settings Modal -->
-    <div class="modal-overlay" id="settingsModal">
-        <div class="settings-modal">
-            <div class="modal-header">
-                <h2>Settings</h2>
-                <button class="close-btn" id="closeSettings"></button>
-            </div>
-            <div class="settings-section">
-                <div class="settings-option">
-                    <h3>Image Saving</h3>
-                    <p>Keeps Images saved even after exiting the site</p>
-                    <div class="toggle-switch"></div>
+            <div class="card-options">
+                <div class="card-option" data-type="credit">
+                    <div class="option-icon credit-icon"></div>
+                    <span>Debit or Credit Card</span>
                 </div>
-                <!-- Add other settings options -->
-            </div>
-        </div>
-    </div>
-
-    <!-- Card Showcase Pages -->
-    <div class="showcase-overlay" id="cardShowcase">
-        <div class="showcase-header">
-            <button class="done-btn">Done</button>
-            <button class="menu-btn outlined">•••</button>
-        </div>
-        <div class="showcase-content">
-            <img class="card-image" src="" alt="Card Preview">
-            <div class="transactions">
-                <h3>Latest Transactions</h3>
-                <p>No Transaction Found</p>
+                <div class="card-option" data-type="loyalty">
+                    <div class="option-icon loyalty-icon"></div>
+                    <span>Passes and other Cards</span>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Modal Handling
-        const modals = {
-            addCard: document.getElementById('addCardModal'),
-            menu: document.getElementById('menuModal'),
-            settings: document.getElementById('settingsModal'),
-            showcase: document.getElementById('cardShowcase')
-        };
+        // Improved Modal Handling
+        let currentModal = null;
 
-        // Event Listeners
-        document.querySelector('.add-btn').addEventListener('click', () => toggleModal('addCard'));
-        document.querySelector('.menu-btn').addEventListener('click', () => toggleModal('menu'));
-        document.getElementById('closeAddModal').addEventListener('click', () => closeModal('addCard'));
-        document.getElementById('closeSettings').addEventListener('click', () => closeModal('settings'));
-
-        // Modal Functions
         function toggleModal(modalName) {
-            modals[modalName].style.display = 'block';
+            if(currentModal) currentModal.style.display = 'none';
+            currentModal = document.getElementById(modalName);
+            currentModal.style.display = 'block';
         }
 
-        function closeModal(modalName) {
-            modals[modalName].style.display = 'none';
+        // Proper Card Stacking
+        let cardOffset = 0;
+        function addCard(imageSrc, type) {
+            const card = document.createElement('div');
+            card.className = `card ${type}`;
+            card.innerHTML = `<img src="${imageSrc}" alt="${type} card">`;
+            
+            card.style.transform = `translateY(${cardOffset}px)`;
+            cardOffset += 22; // 10% overlap
+            
+            card.addEventListener('click', () => {
+                cardOffset -= 22;
+                showCardDetail(imageSrc);
+            });
+
+            document.getElementById('cardContainer').prepend(card);
         }
 
-        // Close modals on outside click
+        // Unified File Handling
+        function setupCardUpload(type) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if(file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        addCard(event.target.result, type);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            input.click();
+        }
+
+        // Event Listeners with Proper Delegation
+        document.querySelectorAll('.card-option').forEach(option => {
+            option.addEventListener('click', () => {
+                const type = option.dataset.type;
+                setupCardUpload(type);
+                toggleModal('addCardModal');
+            });
+        });
+
+        // Improved Modal Closing
         document.querySelectorAll('.modal-overlay').forEach(modal => {
             modal.addEventListener('click', (e) => {
-                if (e.target === modal) closeModal(modal.id);
+                if(e.target === modal) {
+                    modal.style.display = 'none';
+                    cardOffset = 0; // Reset stacking
+                }
             });
-        });
-
-        // Card Management
-        document.querySelectorAll('.card-option').forEach(option => {
-            option.addEventListener('click', function() {
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = 'image/*';
-                input.onchange = handleImageUpload;
-                input.click();
-            });
-        });
-
-        function handleImageUpload(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    const card = createCardElement(event.target.result);
-                    document.getElementById('cardContainer').appendChild(card);
-                };
-                reader.readAsDataURL(file);
-            }
-            closeModal('addCard');
-        }
-
-        function createCardElement(imageSrc) {
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.innerHTML = `<img src="${imageSrc}" alt="Card">`;
-            card.addEventListener('click', () => showCardDetail(imageSrc));
-            return card;
-        }
-
-        // Showcase View
-        function showCardDetail(imageSrc) {
-            document.getElementById('cardShowcase').style.display = 'block';
-            document.querySelector('.card-image').src = imageSrc;
-        }
-
-        // Close Showcase
-        document.querySelector('.done-btn').addEventListener('click', () => {
-            document.getElementById('cardShowcase').style.display = 'none';
         });
     </script>
 </body>
