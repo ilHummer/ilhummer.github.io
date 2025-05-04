@@ -2,51 +2,332 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Wallet Replica</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: #000;
+            color: white;
+            width: 402px;
+            height: 874px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Header Styles */
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 15px 27px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+        }
+
+        .wallet-title {
+            font-size: 32px;
+            font-weight: 800;
+        }
+
+        /* Control Buttons */
+        .control-btn {
+            width: 32px;
+            height: 32px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .control-btn:active {
+            transform: scale(0.9);
+        }
+
+        /* Card Stack */
+        .card-stack {
+            margin-top: 84px;
+            padding: 20px;
+            height: calc(100% - 84px);
+            overflow-y: auto;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 348px;
+            margin: 10px auto;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .card img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            z-index: 2000;
+        }
+
+        /* Add Card Modal */
+        .add-card-modal {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: #1C1C1E;
+            border-radius: 14px 14px 0 0;
+            padding: 24px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .close-btn {
+            width: 27px;
+            height: 27px;
+            background: #313035;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn::before,
+        .close-btn::after {
+            content: '';
+            width: 13px;
+            height: 2px;
+            background: #A2A2AA;
+            position: absolute;
+        }
+
+        .close-btn::before {
+            transform: rotate(45deg);
+        }
+
+        .close-btn::after {
+            transform: rotate(-45deg);
+        }
+
+        /* Settings Modal */
+        .settings-modal {
+            background: #1C1C1E;
+            border-radius: 14px;
+            padding: 24px;
+            width: 90%;
+            max-width: 348px;
+            position: relative;
+        }
+
+        .settings-option {
+            padding: 16px 0;
+            border-bottom: 0.2px solid rgba(178,178,178,0.47);
+        }
+
+        /* Showcase Pages */
+        .showcase-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 3000;
+            display: none;
+        }
+
+        .showcase-header {
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .showcase-content {
+            padding: 20px;
+        }
+    </style>
 </head>
 <body>
-    <!-- Main Container -->
-    <div class="frame">
-        <!-- Header -->
-        <header class="header">
-            <h1 class="wallet-title">Wallet</h1>
-            <div class="header-controls">
-                <button class="menu-btn">•••</button>
-                <button class="add-btn">+</button>
-            </div>
-        </header>
-
-        <!-- Card Stack -->
-        <main class="card-stack">
-            <!-- Dynamically added cards -->
-        </main>
-
-        <!-- Modals -->
-        <div class="modal-overlay" id="menuModal">
-            <div class="modal menu-modal">
-                <div class="menu-item delete">Delete Cards</div>
-                <div class="menu-item">Settings</div>
-                <div class="menu-item">GitHub</div>
-            </div>
+    <!-- Main Page -->
+    <div class="header">
+        <h1 class="wallet-title">Wallet</h1>
+        <div class="header-controls">
+            <button class="control-btn menu-btn">•••</button>
+            <button class="control-btn add-btn">+</button>
         </div>
+    </div>
 
-        <div class="modal-overlay" id="addCardModal">
-            <div class="modal add-card-modal">
+    <main class="card-stack" id="cardContainer">
+        <!-- Cards will be dynamically added here -->
+    </main>
+
+    <!-- Add Card Modal -->
+    <div class="modal-overlay" id="addCardModal">
+        <div class="add-card-modal">
+            <div class="modal-header">
                 <h2>Add to Wallet</h2>
-                <div class="card-option credit-card">
-                    <div class="option-icon"></div>
-                    Debit or Credit Card
-                </div>
-                <div class="card-option other-card">
-                    <div class="option-icon"></div>
-                    Passes and other Cards
-                </div>
+                <button class="close-btn" id="closeAddModal"></button>
+            </div>
+            <div class="card-option">
+                <div class="option-icon credit-icon"></div>
+                Debit or Credit Card
+            </div>
+            <div class="card-option">
+                <div class="option-icon pass-icon"></div>
+                Passes and other Cards
+            </div>
+            <div class="github-watermark">
+                github.com/uplafe<br/>
+                Apple-Wallet-Replica
             </div>
         </div>
     </div>
-    
-    <script src="app.js"></script>
+
+    <!-- 3-dot Menu Modal -->
+    <div class="modal-overlay" id="menuModal">
+        <div class="menu-modal">
+            <div class="menu-item delete">Delete Cards</div>
+            <div class="menu-item">Settings</div>
+            <div class="menu-item">GitHub</div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="settings-modal">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <button class="close-btn" id="closeSettings"></button>
+            </div>
+            <div class="settings-section">
+                <div class="settings-option">
+                    <h3>Image Saving</h3>
+                    <p>Keeps Images saved even after exiting the site</p>
+                    <div class="toggle-switch"></div>
+                </div>
+                <!-- Add other settings options -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Card Showcase Pages -->
+    <div class="showcase-overlay" id="cardShowcase">
+        <div class="showcase-header">
+            <button class="done-btn">Done</button>
+            <button class="menu-btn outlined">•••</button>
+        </div>
+        <div class="showcase-content">
+            <img class="card-image" src="" alt="Card Preview">
+            <div class="transactions">
+                <h3>Latest Transactions</h3>
+                <p>No Transaction Found</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Modal Handling
+        const modals = {
+            addCard: document.getElementById('addCardModal'),
+            menu: document.getElementById('menuModal'),
+            settings: document.getElementById('settingsModal'),
+            showcase: document.getElementById('cardShowcase')
+        };
+
+        // Event Listeners
+        document.querySelector('.add-btn').addEventListener('click', () => toggleModal('addCard'));
+        document.querySelector('.menu-btn').addEventListener('click', () => toggleModal('menu'));
+        document.getElementById('closeAddModal').addEventListener('click', () => closeModal('addCard'));
+        document.getElementById('closeSettings').addEventListener('click', () => closeModal('settings'));
+
+        // Modal Functions
+        function toggleModal(modalName) {
+            modals[modalName].style.display = 'block';
+        }
+
+        function closeModal(modalName) {
+            modals[modalName].style.display = 'none';
+        }
+
+        // Close modals on outside click
+        document.querySelectorAll('.modal-overlay').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal(modal.id);
+            });
+        });
+
+        // Card Management
+        document.querySelectorAll('.card-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.onchange = handleImageUpload;
+                input.click();
+            });
+        });
+
+        function handleImageUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const card = createCardElement(event.target.result);
+                    document.getElementById('cardContainer').appendChild(card);
+                };
+                reader.readAsDataURL(file);
+            }
+            closeModal('addCard');
+        }
+
+        function createCardElement(imageSrc) {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `<img src="${imageSrc}" alt="Card">`;
+            card.addEventListener('click', () => showCardDetail(imageSrc));
+            return card;
+        }
+
+        // Showcase View
+        function showCardDetail(imageSrc) {
+            document.getElementById('cardShowcase').style.display = 'block';
+            document.querySelector('.card-image').src = imageSrc;
+        }
+
+        // Close Showcase
+        document.querySelector('.done-btn').addEventListener('click', () => {
+            document.getElementById('cardShowcase').style.display = 'none';
+        });
+    </script>
 </body>
 </html>
