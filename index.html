@@ -1,217 +1,295 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Wallet Replica</title>
-    <style>
-        /* Improved Base Styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Wallet Clone</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        body {
-            background: #000;
-            color: white;
-            width: 402px;
-            height: 874px;
-            margin: 0 auto;
-            position: relative;
-            overflow: hidden;
-        }
+    body {
+      background: #000;
+      color: white;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      height: 100vh;
+      overflow: hidden;
+    }
 
-        /* Fixed Header Layout */
-        .header {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            padding: 15px 27px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(20px);
-            z-index: 1000;
-        }
+    header {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      background: #000;
+      transition: all 0.3s ease;
+    }
 
-        .header-controls {
-            display: flex;
-            gap: 12px; /* Proper button spacing */
-        }
+    .title {
+      font-size: 32px;
+      font-weight: 700;
+    }
 
-        /* 3-dot Menu Fix */
-        .menu-modal {
-            width: 230px;
-            height: 162px;
-            top: 98px;
-            right: 27px;
-            background: rgba(177, 177, 177, 0.14);
-            backdrop-filter: blur(33.85px);
-            border-radius: 10px;
-            animation: slideIn 0.3s ease-out;
-        }
+    .controls {
+      display: flex;
+      gap: 12px;
+    }
 
-        @keyframes slideIn {
-            from { transform: translateY(-20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
+    .control-btn {
+      width: 44px;
+      height: 44px;
+      background: rgba(255,255,255,0.9);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
 
-        /* Add Card Modal Fix */
-        .add-card-modal {
-            width: 402px;
-            height: 788px;
-            top: 86px;
-            background: #1C1C1E;
-            border-radius: 14px;
-            animation: riseUp 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-        }
+    .control-btn svg {
+      width: 24px;
+      height: 24px;
+      fill: #000;
+    }
 
-        @keyframes riseUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
-        }
+    #done-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1001;
+      background: transparent;
+      color: white;
+      border: none;
+      font-size: 18px;
+      font-weight: bold;
+      display: none;
+      cursor: pointer;
+    }
 
-        /* Card Stacking */
-        .card-stack {
-            margin-top: 84px;
-            padding: 20px;
-            position: relative;
-            height: calc(100% - 84px);
-        }
+    #done-btn.visible {
+      display: block;
+    }
 
-        .card {
-            width: 348px;
-            height: 220px;
-            position: absolute;
-            border-radius: 12px;
-            overflow: hidden;
-            transition: transform 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
+    .card-stack {
+      margin-top: 80px;
+      padding: 20px 0;
+      height: calc(100vh - 80px);
+      overflow-y: auto;
+      scroll-behavior: smooth;
+    }
 
-        .card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+    .section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
 
-        /* Card Stacking Layout */
-        .card:nth-child(1) { transform: translateY(0); z-index: 3; }
-        .card:nth-child(2) { transform: translateY(22px) scale(0.95); z-index: 2; }
-        .card:nth-child(3) { transform: translateY(44px) scale(0.9); z-index: 1; }
+    .card {
+      position: relative;
+      width: 90%;
+      max-width: 400px;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      margin-bottom: -22%; /* overlap to bring them closer */
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      cursor: pointer;
+    }
 
-        /* Showcase Fix */
-        .showcase-overlay img {
-            width: 366px;
-            height: 231px;
-            border-radius: 12px;
-            object-fit: contain; /* Maintain original aspect ratio */
-        }
-    </style>
+    .card img {
+      width: 100%;
+      display: block;
+    }
+
+    .card.active {
+      position: fixed;
+      top: 90px;
+      left: 50%;
+      transform: translate(-50%, 0) scale(1.02);
+      z-index: 1000;
+      width: 90%;
+      max-width: 95%;
+      animation: rise 0.3s ease-out forwards;
+    }
+
+    @keyframes rise {
+      from {
+        transform: translate(-50%, 100%) scale(1);
+      }
+      to {
+        transform: translate(-50%, 0) scale(1.02);
+      }
+    }
+
+    .popup {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #1c1c1e;
+      padding: 1.5rem;
+      border-radius: 24px 24px 0 0;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+    }
+
+    .popup.visible {
+      transform: translateY(0);
+    }
+
+    .popup button {
+      width: 100%;
+      padding: 1rem;
+      background: #363638;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+
+    .header-hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loyalty-separator {
+      height: 150px;
+    }
+  </style>
 </head>
 <body>
-    <!-- Main Page -->
-    <div class="header">
-        <h1 class="wallet-title">Wallet</h1>
-        <div class="header-controls">
-            <button class="control-btn menu-btn">•••</button>
-            <button class="control-btn add-btn">+</button>
-        </div>
+  <header>
+    <h1 class="title">Wallet</h1>
+    <div class="controls">
+      <div class="control-btn" id="addBtn">
+        <svg viewBox="0 0 24 24"><path d="M19 11h-6V5a1 1 0 0 0-2 0v6H5a1 1 0 0 0 0 2h6v6a1 1 0 0 0 2 0v-6h6a1 1 0 0 0 0-2z"/></svg>
+      </div>
     </div>
+  </header>
 
-    <!-- Card Stack with Improved Layout -->
-    <main class="card-stack" id="cardContainer"></main>
+  <button id="done-btn">Done</button>
 
-    <!-- Add Card Modal -->
-    <div class="modal-overlay" id="addCardModal">
-        <div class="add-card-modal">
-            <!-- Modal content with proper spacing -->
-            <div class="modal-header">
-                <h2>Add to Wallet</h2>
-                <button class="close-btn" id="closeAddModal">×</button>
-            </div>
-            <div class="card-options">
-                <div class="card-option" data-type="credit">
-                    <div class="option-icon credit-icon"></div>
-                    <span>Debit or Credit Card</span>
-                </div>
-                <div class="card-option" data-type="loyalty">
-                    <div class="option-icon loyalty-icon"></div>
-                    <span>Passes and other Cards</span>
-                </div>
-            </div>
-        </div>
-    </div>
+  <div class="card-stack">
+    <div class="section" id="creditSection"></div>
+    <div class="loyalty-separator"></div>
+    <div class="section" id="loyaltySection"></div>
+  </div>
 
-    <script>
-        // Improved Modal Handling
-        let currentModal = null;
+  <div class="popup">
+    <button id="addCreditBtn">Add Credit/Debit Card</button>
+    <button id="addLoyaltyBtn">Add Loyalty Card</button>
+    <button id="cancelBtn">Cancel</button>
+  </div>
 
-        function toggleModal(modalName) {
-            if(currentModal) currentModal.style.display = 'none';
-            currentModal = document.getElementById(modalName);
-            currentModal.style.display = 'block';
-        }
+  <script>
+    const STORAGE_KEY = 'walletCards';
+    let creditCards = [];
+    let loyaltyCards = [];
 
-        // Proper Card Stacking
-        let cardOffset = 0;
-        function addCard(imageSrc, type) {
-            const card = document.createElement('div');
-            card.className = `card ${type}`;
-            card.innerHTML = `<img src="${imageSrc}" alt="${type} card">`;
-            
-            card.style.transform = `translateY(${cardOffset}px)`;
-            cardOffset += 22; // 10% overlap
-            
-            card.addEventListener('click', () => {
-                cardOffset -= 22;
-                showCardDetail(imageSrc);
-            });
+    function saveCards() {
+      const data = [
+        ...creditCards.map(card => ({ image: card.image, isLoyalty: false })),
+        ...loyaltyCards.map(card => ({ image: card.image, isLoyalty: true }))
+      ];
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
 
-            document.getElementById('cardContainer').prepend(card);
-        }
+    function loadSavedCards() {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      saved.forEach(({ image, isLoyalty }) => {
+        createCard(image, isLoyalty);
+      });
+    }
 
-        // Unified File Handling
-        function setupCardUpload(type) {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            
-            input.onchange = (e) => {
-                const file = e.target.files[0];
-                if(file) {
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        addCard(event.target.result, type);
-                    };
-                    reader.readAsDataURL(file);
-                }
-            };
-            input.click();
-        }
+    function createCard(imageSrc, isLoyalty) {
+      const card = document.createElement('div');
+      card.className = 'card';
+      const img = document.createElement('img');
+      img.src = imageSrc;
+      card.appendChild(img);
 
-        // Event Listeners with Proper Delegation
-        document.querySelectorAll('.card-option').forEach(option => {
-            option.addEventListener('click', () => {
-                const type = option.dataset.type;
-                setupCardUpload(type);
-                toggleModal('addCardModal');
-            });
+      const section = isLoyalty ? document.getElementById('loyaltySection') : document.getElementById('creditSection');
+      section.appendChild(card);
+
+      const data = { element: card, image: imageSrc };
+      (isLoyalty ? loyaltyCards : creditCards).push(data);
+
+      card.addEventListener('click', () => {
+        card.classList.add('active');
+        document.getElementById('done-btn').classList.add('visible');
+        document.querySelectorAll('.card:not(.active)').forEach(c => {
+          c.style.opacity = '0';
+          c.style.pointerEvents = 'none';
         });
+        document.querySelector('header').classList.add('header-hidden');
+      });
 
-        // Improved Modal Closing
-        document.querySelectorAll('.modal-overlay').forEach(modal => {
-            modal.addEventListener('click', (e) => {
-                if(e.target === modal) {
-                    modal.style.display = 'none';
-                    cardOffset = 0; // Reset stacking
-                }
-            });
+      saveCards();
+    }
+
+    document.getElementById('done-btn').addEventListener('click', () => {
+      const active = document.querySelector('.card.active');
+      if (active) {
+        active.classList.remove('active');
+        active.style.opacity = '1';
+        document.querySelectorAll('.card').forEach(c => {
+          c.style.opacity = '1';
+          c.style.pointerEvents = 'auto';
         });
-    </script>
+        document.querySelector('header').classList.remove('header-hidden');
+        document.getElementById('done-btn').classList.remove('visible');
+      }
+    });
+
+    document.getElementById('addBtn').addEventListener('click', () => {
+      document.querySelector('.popup').classList.add('visible');
+    });
+
+    document.getElementById('cancelBtn').addEventListener('click', () => {
+      document.querySelector('.popup').classList.remove('visible');
+    });
+
+    document.getElementById('addCreditBtn').addEventListener('click', () => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.onchange = e => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          createCard(reader.result, false);
+        };
+        reader.readAsDataURL(e.target.files[0]);
+      };
+      input.click();
+      document.querySelector('.popup').classList.remove('visible');
+    });
+
+    document.getElementById('addLoyaltyBtn').addEventListener('click', () => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.onchange = e => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          createCard(reader.result, true);
+        };
+        reader.readAsDataURL(e.target.files[0]);
+      };
+      input.click();
+      document.querySelector('.popup').classList.remove('visible');
+    });
+
+    loadSavedCards();
+  </script>
 </body>
 </html>
